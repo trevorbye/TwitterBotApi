@@ -1,14 +1,7 @@
-﻿using Microsoft.Owin.Security.ActiveDirectory;
-using Microsoft.Owin.Security.OAuth;
+﻿using Microsoft.Owin.Security.OAuth;
 using Owin;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Web;
-
-// no longer in System. dir
-using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens;
 
 namespace TwitterBot
 {
@@ -16,15 +9,16 @@ namespace TwitterBot
     {
         public void ConfigureAuth(IAppBuilder app)
         {
-            app.UseWindowsAzureActiveDirectoryBearerAuthentication(
-                new WindowsAzureActiveDirectoryBearerAuthenticationOptions
-                {
-                    Tenant = ConfigurationManager.AppSettings["ida:Tenant"],
-                    TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidAudience = ConfigurationManager.AppSettings["ida:Audience"]
-                    }
-                });
+            var tvps = new TokenValidationParameters
+            {
+                ValidAudience = ConfigurationManager.AppSettings["ida:Audience"],
+                ValidateIssuer = false
+            };
+
+            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
+            {
+                AccessTokenFormat = new Microsoft.Owin.Security.Jwt.JwtFormat(tvps, new OpenIdConnectCachingSecurityTokenProvider("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")),
+            });
         }
     }
 }

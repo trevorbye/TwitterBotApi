@@ -48,6 +48,39 @@ var clientApplication;
         clientApplication.loginPopup().then(onSignin);
     });
 
+    $(".auth-test").click(function () {
+        scope = [window.config.clientID];
+
+        clientApplication.acquireTokenSilent(scope)
+            .then(function (token) {
+                authTest(token);
+            }, function (error) {
+                clientApplication.acquireTokenPopup(scope).then(function (token) {
+                    authTest(token);
+                }, function (error) {
+                    printErrorMessage(error);
+                });
+            })
+    });
+
+    function authTest(accessToken) {
+        $.ajax({
+            type: "GET",
+            url: "/api/AdminManagers",
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Accept': "application/json"
+            },
+            data: {
+               
+            },
+        }).done(function (response) {
+            console.log(response);
+        }).fail(function () {
+        }).always(function () {
+        });
+    }
+
     function onSignin(idToken) {
         // Check Login Status, Update UI
         var user = clientApplication.getUser();

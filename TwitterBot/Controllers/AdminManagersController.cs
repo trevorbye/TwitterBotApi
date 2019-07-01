@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using TwitterBot.Models;
+using System.Security.Claims;
 
 namespace TwitterBot.Controllers
 {
@@ -21,6 +22,7 @@ namespace TwitterBot.Controllers
         // GET: api/AdminManagers
         public IHttpActionResult GetAdminManagers()
         {
+            IEnumerable<Claim> tenantId = ClaimsPrincipal.Current.Claims;
             IList<AdminManager> adminManagers = db.AdminManagers.ToList();
             if (adminManagers.Count == 0)
             {
