@@ -13,6 +13,7 @@ using TwitterBot.Models;
 
 namespace TwitterBot.Controllers
 {
+    [Authorize]
     public class AdminManagersController : ApiController
     {
         private TwitterBotContext db = new TwitterBotContext();
