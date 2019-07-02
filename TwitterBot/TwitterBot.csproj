@@ -147,6 +147,7 @@
     <Compile Include="Models\AdminManager.cs" />
     <Compile Include="Models\RestTest.cs" />
     <Compile Include="Models\TwitterBotContext.cs" />
+    <Compile Include="POCOS\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
