@@ -1,5 +1,5 @@
 ﻿let homepage = `
-    <div class="row">
+    <div class="row" id="homecontent">
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-body">

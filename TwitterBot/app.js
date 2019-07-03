@@ -80,7 +80,6 @@
             $signInButton.show();
             $signOutButton.hide();
         }
-
     }
 
     // client-side routing logic
@@ -93,7 +92,7 @@
         templateDiv.innerHTML = routes[window.location.pathname];
     }
 
-    let onNavItemClick = (pathName) => {
+    onNavItemClick = function(pathName) {
         window.history.pushState({}, pathName, window.location.origin + pathName);
         templateDiv.innerHTML = routes[pathName];
     }
