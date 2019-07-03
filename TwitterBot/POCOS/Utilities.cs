@@ -3,21 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Security.Claims;
+using TwitterBot.Models;
 
 namespace TwitterBot.POCOS
 {
-    public class Utilities
+    public static class Utilities
     {
-        public static bool isMsftInternalTenant(IEnumerable<Claim> claims)
+        public static bool isAdmin(IEnumerable<Claim> claims, TwitterBotContext db)
         {
+            string preferredUsername = "";
             foreach (Claim claim in claims)
             {
-                if (claim.Type == "iss")
+                if (claim.Type == "preferred_username")
                 {
-
+                    preferredUsername = claim.Value;
+                    break;
                 }
             }
-            return false;
+            var admin = db.AdminManagers
+                                .Where(admins => admins.User == preferredUsername)
+                                .FirstOrDefault();
+            if (admin == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
