@@ -1,102 +1,50 @@
-﻿var clientApplication;
+﻿var clientId = "f3031107-74e2-4be0-ae9a-e015c90c42c2";
+function authCallback(errorDesc, token, error, tokenType) {
+    if (token) {
+    }
+    else {
+        log(error + ":" + errorDesc);
+    }
+}
+var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallback);
 
 (function () {
 
-    window.config = {
-        clientID: 'f3031107-74e2-4be0-ae9a-e015c90c42c2',
-    };
+    var twitterBot = angular.module('twitterBot', ['ngRoute']);
 
-    function authCallback(errorDesc, token, error, tokenType) {
-        if (token) {
-        }
-        else {
-            log(error + ":" + errorDesc);
-        }
-    }
-
-    if (!clientApplication) {
-        clientApplication = new Msal.UserAgentApplication(window.config.clientID, null, authCallback);
-    }
-
-    var $userDisplay = $(".app-user");
-    var $signInButton = $(".app-login");
-    var $signOutButton = $(".app-logout");
-    var $errorMessage = $(".app-error");
-    onSignin(null);
-
-    $signOutButton.click(function () {
-        clientApplication.logout();
-    });
-
-    $signInButton.click(function () {
-        clientApplication.loginPopup().then(onSignin);
-    });
-
-    $(".auth-test").click(function () {
-        scope = [window.config.clientID];
-
-        clientApplication.acquireTokenSilent(scope)
-            .then(function (token) {
-                authTest(token);
-            }, function (error) {
-                clientApplication.acquireTokenPopup(scope).then(function (token) {
-                    authTest(token);
-                }, function (error) {
-                    
-                });
-            })
-    });
-
-    function authTest(accessToken) {
-        $.ajax({
-            type: "GET",
-            url: "current-principal-admin",
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Accept': "application/json"
-            },
-            data: {
-               
-            },
-        }).done(function (response) {
-            console.log(response);
-        }).fail(function () {
-        }).always(function () {
+    twitterBot.config(function ($routeProvider, $httpProvider) {
+        $routeProvider.when('/', {
+            templateUrl: 'templates/home.html',
+            controller: 'home',
+            controllerAs: 'controller'
         });
-    }
+    });
 
-    function onSignin(idToken) {
-        // Check Login Status, Update UI
-        var user = clientApplication.getUser();
-        if (user) {
-            console.log(user)
-            $userDisplay.html(user.name);
-            $userDisplay.show();
-            $signInButton.hide();
-            $signOutButton.show();
-        } else {
-            $userDisplay.empty();
-            $userDisplay.hide();
-            $signInButton.show();
-            $signOutButton.hide();
-        }
-    }
+    twitterBot.controller("navcontroller", function ($rootScope, $http, $location, $scope) {
+        $scope.loggedIn = false;
+        $scope.user = "";
 
-    // client-side routing logic
-    let templateDiv = document.getElementById('templates');
-    let routes = {
-        '/': homepage
-    };
+        $scope.login = function () {
+            clientApplication.loginPopup().then(function (token) {
+                console.log(token);
+                var user = clientApplication.getUser();
+                $scope.loggedIn = true;
+                $scope.user = user.name;
+                $scope.$apply();
+            });
+        };
 
-    window.onpopstate = () => {
-        templateDiv.innerHTML = routes[window.location.pathname];
-    }
+        $scope.logout = function () {
+            clientApplication.logout();
+        };
 
-    onNavItemClick = function(pathName) {
-        window.history.pushState({}, pathName, window.location.origin + pathName);
-        templateDiv.innerHTML = routes[pathName];
-    }
+        $scope.home = function () {
+            $location.path("/");
+        };
+    });
 
-    templateDiv.innerHTML = routes[window.location.pathname];
+    twitterBot.controller("home", function ($rootScope, $http, $location, $scope) {
+    });
 
-}());
+
+})();
