@@ -25,7 +25,7 @@ namespace TwitterBot.Controllers
         public IHttpActionResult IsCurrentPrincipalAdmin()
         {
             IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            bool isAdmin = Utilities.isAdmin(claims, db);
+            bool isAdmin = Utilities.IsAdmin(claims, db);
             return Ok(isAdmin);
         }
 

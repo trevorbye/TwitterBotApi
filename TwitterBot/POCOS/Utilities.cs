@@ -9,7 +9,7 @@ namespace TwitterBot.POCOS
 {
     public static class Utilities
     {
-        public static bool isAdmin(IEnumerable<Claim> claims, TwitterBotContext db)
+        public static bool IsAdmin(IEnumerable<Claim> claims, TwitterBotContext db)
         {
             string preferredUsername = "";
             foreach (Claim claim in claims)
@@ -31,6 +31,18 @@ namespace TwitterBot.POCOS
             {
                 return true;
             }
+        }
+
+        public static string UsernameFromClaims(IEnumerable<Claim> claims)
+        {
+            foreach (Claim claim in claims)
+            {
+                if (claim.Type == "preferred_username")
+                {
+                    return claim.Value;
+                }
+            }
+            return "";
         }
     }
 }

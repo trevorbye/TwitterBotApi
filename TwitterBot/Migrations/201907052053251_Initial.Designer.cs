@@ -13,7 +13,7 @@ namespace TwitterBot.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201906292243120_Initial"; }
+            get { return "201907052053251_Initial"; }
         }
         
         string IMigrationMetadata.Source

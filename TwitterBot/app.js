@@ -12,12 +12,14 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
     var twitterBot = angular.module('twitterBot', ['ngRoute']);
 
-    twitterBot.config(function ($routeProvider, $httpProvider) {
+    twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
         $routeProvider.when('/', {
             templateUrl: 'templates/home.html',
             controller: 'home',
             controllerAs: 'controller'
         });
+
+        $locationProvider.html5Mode(true);
     });
 
     twitterBot.controller("navcontroller", function ($rootScope, $http, $location, $scope) {
@@ -44,6 +46,37 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     });
 
     twitterBot.controller("home", function ($rootScope, $http, $location, $scope) {
+        $scope.manage = function () {
+            $location.path("/management-portal");
+        }
+
+        $scope.tweet = function () {
+            $location.path("/tweet-portal");
+        }
+
+        $scope.httpTest = function () {
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get("current-principal-admin", config).then(function (response) {
+                        console.log(response.data)
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                        
+                    }, function (error) {
+
+                    });
+                })
+
+            
+        }
     });
 
 

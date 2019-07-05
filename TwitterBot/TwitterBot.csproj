@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.js" />
+    <Content Include="css\main.css" />
     <Content Include="index.html" />
     <Content Include="Global.asax" />
     <Content Include="templates\home.html" />
@@ -137,16 +138,18 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminManagersController.cs" />
     <Compile Include="Controllers\AppController.cs" />
+    <Compile Include="Controllers\TweetQueuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201906292243120_Initial.cs" />
-    <Compile Include="Migrations\201906292243120_Initial.Designer.cs">
-      <DependentUpon>201906292243120_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201907052053251_Initial.cs" />
+    <Compile Include="Migrations\201907052053251_Initial.Designer.cs">
+      <DependentUpon>201907052053251_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdminManager.cs" />
     <Compile Include="Models\RestTest.cs" />
+    <Compile Include="Models\TweetQueue.cs" />
     <Compile Include="Models\TwitterBotContext.cs" />
     <Compile Include="POCOS\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -165,8 +168,8 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201906292243120_Initial.resx">
-      <DependentUpon>201906292243120_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201907052053251_Initial.resx">
+      <DependentUpon>201907052053251_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

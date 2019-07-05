@@ -20,5 +20,7 @@ namespace TwitterBot.Models
         }
 
         public System.Data.Entity.DbSet<TwitterBot.Models.AdminManager> AdminManagers { get; set; }
+
+        public System.Data.Entity.DbSet<TwitterBot.Models.TweetQueue> TweetQueues { get; set; }
     }
 }
