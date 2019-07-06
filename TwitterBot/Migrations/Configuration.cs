@@ -38,7 +38,7 @@ namespace TwitterBot.Migrations
                     TweetUser = "trbye@microsoft.com",
                     CreatedTime = DateTime.Now,
                     HandleUser = "test",
-                    IsApprovedByHandle = false,
+                    IsApprovedByHandle = true,
                     IsCanceledByHandle = false,
                     ScheduledStatusTime = DateTime.Now,
                     StatusBody = "Testing another tweet. This one is slightly longer.",

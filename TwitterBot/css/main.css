@@ -1,7 +1,15 @@
-﻿.home-icons {
-    color: #E94B29
+﻿.fa-times-circle {
+    color: #DB162F;
 }
 
-    .home-icons:hover {
-        color: #bf2808
-    }
+.fa-check {
+    color: #139c1c;
+}
+
+.home-icons {
+    color: #E94B29;
+}
+
+.home-icons:hover {
+    color: #bf2808;
+}

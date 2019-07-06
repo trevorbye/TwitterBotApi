@@ -5,15 +5,20 @@
 </div>
 <div class="row">
     <div class="col-md-12">
+
         <div class="list-group">
-            <div ng-repeat="x in tweetQueue" class="class=" list-group-item list-group-item-action flex-column align-items-start">
+            <div ng-repeat="x in tweetQueue" class="list-group-item list-group-item-action flex-column align-items-start">
                 <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{x.TwitterHandle}}</h5>
+                    <h5 class="mb-1 handles">{{x.TwitterHandle}}</h5>
                     <small>{{x.CreatedTime}}</small>
                 </div>
                 <p class="mb-1">{{x.StatusBody}}</p>
-                <small>Scheduled For: {{x.ScheduledStatusTime}}</small>
+                <div class="d-flex w-100 justify-content-between">
+                    <small>Scheduled For: {{x.ScheduledStatusTime}}</small>
+                    <span><i ng-show="!x.IsApprovedByHandle" class="fas fa-times-circle fa-lg"></i><i ng-show="x.IsApprovedByHandle" class="fas fa-check fa-lg"></i></span>
+                </div>
             </div>
         </div>
+
     </div>
 </div>

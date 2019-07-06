@@ -36,7 +36,6 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 var user = clientApplication.getUser();
                 $scope.loggedIn = true;
                 $scope.user = user.name;
-                $rootScope.authToken = token;
                 $scope.$apply();
             });
         };
@@ -63,17 +62,6 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope) {
         $scope.tweetQueue = null;
 
-        var config = {
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': 'Bearer ' + $rootScope.authToken
-            }
-        };
-
-        $http.get("get-user-tweet-queue", config).then(function (response) {
-            $scope.tweetQueue = response.data;
-        });
-        /*
         clientApplication.acquireTokenSilent([clientId])
             .then(function (token) {
                 var config = {
@@ -94,7 +82,6 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                 });
             });
-            */
     });
 
 
