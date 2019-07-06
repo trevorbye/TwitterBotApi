@@ -17,6 +17,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             templateUrl: 'templates/home.html',
             controller: 'home',
             controllerAs: 'controller'
+        }).when('/tweet-portal', {
+            templateUrl: 'templates/tweets.html',
+            controller: 'tweets',
+            controllerAs: 'controller'
         });
 
         $locationProvider.html5Mode(true);
@@ -32,6 +36,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 var user = clientApplication.getUser();
                 $scope.loggedIn = true;
                 $scope.user = user.name;
+                $rootScope.authToken = token;
                 $scope.$apply();
             });
         };
@@ -53,30 +58,43 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.tweet = function () {
             $location.path("/tweet-portal");
         }
+    });
 
-        $scope.httpTest = function () {
-            clientApplication.acquireTokenSilent([clientId])
-                .then(function (token) {
-                    var config = {
-                        headers: {
-                            'Content-type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        }
-                    };
+    twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope) {
+        $scope.tweetQueue = null;
 
-                    $http.get("current-principal-admin", config).then(function (response) {
-                        console.log(response.data)
-                    });
+        var config = {
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': 'Bearer ' + $rootScope.authToken
+            }
+        };
+
+        $http.get("get-user-tweet-queue", config).then(function (response) {
+            $scope.tweetQueue = response.data;
+        });
+        /*
+        clientApplication.acquireTokenSilent([clientId])
+            .then(function (token) {
+                var config = {
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    }
+                };
+
+                $http.get("get-user-tweet-queue", config).then(function (response) {
+                    $scope.tweetQueue = response.data;
+                    $scope.$apply();
+                });
+            }, function (error) {
+                clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
-                        
-                    }, function (error) {
 
-                    });
-                })
-
-            
-        }
+                });
+            });
+            */
     });
 
 

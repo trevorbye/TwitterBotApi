@@ -1,0 +1,19 @@
+﻿<div class="row">
+    <div class="col-md-12">
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="list-group">
+            <div ng-repeat="x in tweetQueue" class="class=" list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{x.TwitterHandle}}</h5>
+                    <small>{{x.CreatedTime}}</small>
+                </div>
+                <p class="mb-1">{{x.StatusBody}}</p>
+                <small>Scheduled For: {{x.ScheduledStatusTime}}</small>
+            </div>
+        </div>
+    </div>
+</div>

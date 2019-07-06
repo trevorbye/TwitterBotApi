@@ -12,6 +12,7 @@ using System.Web.Http.Description;
 using TwitterBot.Models;
 using TwitterBot.POCOS;
 using System.Security.Claims;
+using System.Data.SqlClient;
 
 namespace TwitterBot.Controllers
 {
@@ -25,8 +26,17 @@ namespace TwitterBot.Controllers
         public IHttpActionResult GetUserTweetQueue()
         {
             IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+
+            
             string user = Utilities.UsernameFromClaims(claims);
-            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user).ToList();
+            
+
+            //IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user).ToList();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var tweets = db.TweetQueues.SqlQuery("SELECT * FROM dbo.TweetQueues WHERE TweetUser=@user", new SqlParameter("user", user)).ToList();
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            Console.WriteLine(elapsedMs);
             return Ok(tweets);
         }
 
