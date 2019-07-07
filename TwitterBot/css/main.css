@@ -7,9 +7,13 @@
 }
 
 .home-icons {
-    color: #E94B29;
+    color: #1DA1F2;
 }
 
 .home-icons:hover {
-    color: #bf2808;
+    color: #1c5fc9
+}
+
+.twitter {
+    color: #1DA1F2;
 }

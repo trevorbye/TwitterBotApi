@@ -1,10 +1,44 @@
 ﻿<div class="row">
-    <div class="col-md-12">
 
+    <div class="col-md-6">
+        <h2 class="mb-3">Compose and schedule</h2>
+        <p class="mb-3">
+            Compose a Tweet, select a handle, and choose a time when the status will be posted to the account. The 
+            request will be routed to the handle owner for approval.
+        </p>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="handleSelect">Twitter handle</label>
+            </div>
+            <select class="custom-select" id="handleSelect" ng-model="tweetSubmitObject.handle">
+                <option ng-repeat="handle in handles" value="{{handle}}">{{handle}}</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fab fa-twitter fa-lg twitter"></i>
+                </span>
+            </div>
+            <textarea class="form-control" rows="5" id="body-text" ng-model="tweetSubmitObject.body"></textarea>
+        </div>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    Scheduled date
+                </span>
+            </div>
+            <input type="date" name="bday" max="3000-12-31" min="1000-01-01" class="form-control">
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
+
+    <div class="col-md-6">
+        <h2 class="mb-3">Your tweet queue</h2>
+        <p class="mb-3">
+            View your current queue of Tweets. The icons indicate whether or not the handle owner has accepted your request.
+            You can cancel unapproved Tweets, or cancel approved Tweets up until the scheduled status time.
+        </p>
 
         <div class="list-group">
             <div ng-repeat="x in tweetQueue" class="list-group-item list-group-item-action flex-column align-items-start">
@@ -19,6 +53,6 @@
                 </div>
             </div>
         </div>
-
     </div>
+
 </div>

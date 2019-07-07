@@ -60,7 +60,9 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     });
 
     twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope) {
-        $scope.tweetQueue = null;
+        $scope.tweetQueue = [];
+        $scope.handles = [];
+        $scope.tweetSubmitObject = {};
 
         clientApplication.acquireTokenSilent([clientId])
             .then(function (token) {
@@ -75,6 +77,12 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     $scope.tweetQueue = response.data;
                     $scope.$apply();
                 });
+
+                $http.get("get-distinct-handles", config).then(function (response) {
+                    $scope.handles = response.data;
+                    $scope.$apply();
+                });
+
             }, function (error) {
                 clientApplication.acquireTokenPopup([clientId]).then(function (token) {
 

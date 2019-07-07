@@ -26,18 +26,17 @@ namespace TwitterBot.Controllers
         public IHttpActionResult GetUserTweetQueue()
         {
             IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-
-            
             string user = Utilities.UsernameFromClaims(claims);
-            
-
-            //IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user).ToList();
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            var tweets = db.TweetQueues.SqlQuery("SELECT * FROM dbo.TweetQueues WHERE TweetUser=@user", new SqlParameter("user", user)).ToList();
-            watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            Console.WriteLine(elapsedMs);
+            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user).ToList();
             return Ok(tweets);
+        }
+
+        [Route("get-distinct-handles")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult GetDistinctHandles()
+        {
+            IList<string> distinctHandles = db.TweetQueues.Select(table => table.TwitterHandle).Distinct().ToList();
+            return Ok(distinctHandles);
         }
 
         // GET: api/TweetQueues/5
