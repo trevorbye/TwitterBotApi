@@ -3,7 +3,7 @@
     <div class="col-md-6">
         <h2 class="mb-3">Compose and schedule</h2>
         <p class="mb-3">
-            Compose a Tweet, select a handle, and choose a time when the status will be posted to the account. The 
+            Compose a Tweet, select a handle, and choose a time when the status will be posted to the account. The
             request will be routed to the handle owner for approval.
         </p>
 
@@ -23,14 +23,16 @@
             </div>
             <textarea class="form-control" rows="5" id="body-text" ng-model="tweetSubmitObject.body"></textarea>
         </div>
-        <div class="input-group">
+        <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">
-                    Scheduled date
+                    Scheduled date & time
                 </span>
             </div>
-            <input type="date" name="bday" max="3000-12-31" min="1000-01-01" class="form-control">
+            <input type="date" max="3000-12-31" min="1000-01-01" class="form-control" ng-model="tweetSubmitObject.date">
+            <input type="time" class="form-control" ng-model="tweetSubmitObject.time" />
         </div>
+        <button type="button" class="btn btn-success mb-3" ng-click="submitTweet()">Create Tweet</button>
     </div>
 
     <div class="col-md-6">
