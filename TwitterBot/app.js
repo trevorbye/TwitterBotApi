@@ -30,6 +30,13 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.loggedIn = false;
         $scope.user = "";
 
+        //on site load check if active token already exists in cache, then set ui auth state
+        var cachedUser = clientApplication.getUser();
+        if (cachedUser != null) {
+            $scope.user = cachedUser.name;
+            $scope.loggedIn = true;
+        } 
+
         $scope.login = function () {
             clientApplication.loginPopup().then(function (token) {
                 console.log(token);
@@ -59,10 +66,13 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         }
     });
 
-    twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope) {
+    twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope, $routeParams) {
         $scope.tweetQueue = [];
         $scope.handles = [];
         $scope.tweetSubmitObject = {};
+
+        var oauthToken = $routeParams.oauth_token;
+        var oauthVerifier = $routeParams.oauth_verifier;
 
         clientApplication.acquireTokenSilent([clientId])
             .then(function (token) {
