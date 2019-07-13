@@ -25,6 +25,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             templateUrl: 'templates/manage.html',
             controller: 'manage',
             controllerAs: 'controller'
+        }).when('/add-account-redirect', {
+            templateUrl: 'templates/twitter-redirect.html',
+            controller: 'redirect',
+            controllerAs: 'controller'
         });
 
         $locationProvider.html5Mode(true);
@@ -74,10 +78,6 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.tweetQueue = [];
         $scope.handles = [];
         $scope.tweetSubmitObject = {};
-
-        //accepts url?oauth_token=TOKEN&oauth_verifier=TOKEN
-        var oauthToken = $routeParams.oauth_token;
-        var oauthVerifier = $routeParams.oauth_verifier;
 
         clientApplication.acquireTokenSilent([clientId])
             .then(function (token) {
@@ -130,6 +130,16 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     });
                 });
         };
+    });
+
+    twitterBot.controller("redirect", function ($http, $location, $scope, $routeParams) {
+
+        //parses url?oauth_token=TOKEN&oauth_verifier=TOKEN
+        var oauthToken = $routeParams.oauth_token;
+        var oauthVerifier = $routeParams.oauth_verifier;
+        console.log(oauthToken)
+        console.log(oauthVerifier)
+
     });
 
 })();

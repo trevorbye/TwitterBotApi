@@ -1,9 +1,9 @@
 ﻿.fa-times-circle {
-    color: #DB162F;
+    color: #dc3545;
 }
 
-.fa-check {
-    color: #139c1c;
+.fa-check, .fa-check-circle {
+    color: #28a745;
 }
 
 .home-icons {
