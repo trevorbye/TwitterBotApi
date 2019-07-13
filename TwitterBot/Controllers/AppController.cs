@@ -6,40 +6,43 @@ using System.Net.Http;
 using System.Web.Http;
 using TwitterBot.Models;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace TwitterBot.Controllers
 {
     [Authorize]
     public class AppController : ApiController
     {
+        private string ShaHash(string value, string signingKey)
+        {
+            using (var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)))
+            {
+                return Convert.ToBase64String(hmac.ComputeHash(Encoding.ASCII.GetBytes(value)));
+            }
+        }
+
         [Route("twitter-auth-token")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetTwitterOauthString()
         {
             string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/request_token");
             string oauthCallback = WebUtility.UrlEncode("http://localhost:52937/add-account-redirect");
-            string oauthConsumerKey = "OmlAUrh2VxAKX6Qp2bYzwxBwI";
+            string oauthConsumerKey = WebUtility.UrlEncode("OmlAUrh2VxAKX6Qp2bYzwxBwI");
             string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
-            string sigMethod = "HMAC-SHA1";
+            string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
             string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            string version = "1.0";
+            string version = WebUtility.UrlEncode("1.0");
 
             string paramString = "oauth_callback=" + oauthCallback + "&" +
                 "oauth_consumer_key=" + oauthConsumerKey + "&" +
                 "oauth_nonce=" + oauthNonce + "&" +
-                "oauth_signature_method" + sigMethod + "&" +
-                "oauth_timestamp" + timestamp + "&" +
-                "oauth_version" + version;
+                "oauth_signature_method=" + sigMethod + "&" +
+                "oauth_timestamp=" + timestamp + "&" +
+                "oauth_version=" + version;
 
             string signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
             string signingKey = "4HmFBAX1w6xuz4onP0lHwq7ANMQ6vswEokIiNnJY6kHuUd51ek" + "&";
-
-            var encoding = new System.Text.ASCIIEncoding();
-            byte[] keyByte = encoding.GetBytes(signingKey);
-            byte[] messageBytes = encoding.GetBytes(signatureBaseString);
-            var hmacsha256 = new HMACSHA256(keyByte);
-            byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
-            string oauthSignature = Convert.ToBase64String(hashmessage);
+            string oauthSignature = ShaHash(signatureBaseString, signingKey);
 
             string authString = "OAuth " +
                 "oauth_callback=" + "\"" + oauthCallback + "\"" + ", " +
@@ -61,9 +64,9 @@ namespace TwitterBot.Controllers
                 }
             };
             var response = client.SendAsync(request).Result;
-
-
-            return null;
+            var content = response.Content.ReadAsStringAsync().Result;
+            string authToken = content.Substring(content.IndexOf("oauth_token=") + 12, content.IndexOf("&oauth_token_secret") - 12);
+            return Ok(authToken);
         }
     }
 }

@@ -107,7 +107,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             });
     });
 
-    twitterBot.controller("manage", function ($rootScope, $http, $location, $scope, $routeParams) {
+    twitterBot.controller("manage", function ($rootScope, $http, $location, $scope, $routeParams, $window) {
 
         $scope.twitterSignIn = function () {
             clientApplication.acquireTokenSilent([clientId])
@@ -120,7 +120,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     };
 
                     $http.get("twitter-auth-token", config).then(function (response) {
-                        
+                        $window.location.href = "https://api.twitter.com/oauth/authenticate?oauth_token=" + response.data;
                     });
                 }, function (error) {
                     clientApplication.acquireTokenPopup([clientId]).then(function (token) {
