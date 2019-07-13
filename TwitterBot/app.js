@@ -88,12 +88,12 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     }
                 };
 
-                $http.get("get-user-tweet-queue", config).then(function (response) {
+                $http.get("api/get-user-tweet-queue", config).then(function (response) {
                     $scope.tweetQueue = response.data;
                     $scope.$apply();
                 });
 
-                $http.get("get-distinct-handles", config).then(function (response) {
+                $http.get("api/get-distinct-handles", config).then(function (response) {
                     $scope.handles = response.data;
                     $scope.$apply();
                 });
@@ -119,7 +119,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         }
                     };
 
-                    $http.get("twitter-auth-token", config).then(function (response) {
+                    $http.get("api/twitter-auth-token", config).then(function (response) {
                         $window.location.href = "https://api.twitter.com/oauth/authenticate?oauth_token=" + response.data;
                     });
                 }, function (error) {
@@ -139,6 +139,37 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         var oauthVerifier = $routeParams.oauth_verifier;
         console.log(oauthToken)
         console.log(oauthVerifier)
+
+        var params = {
+            token: oauthToken,
+            verifier: oauthVerifier
+        };
+
+        clientApplication.acquireTokenSilent([clientId])
+            .then(function (token) {
+                var config = {
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    params: params
+                };
+
+                $http.get("api/convert-to-access-token", config).then(function (response) {
+                    
+                });
+
+            }, function (error) {
+                clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                }, function (error) {
+
+                });
+            });
+
+        $scope.backToPortal = function () {
+            $location.path("/management-portal");
+        };
 
     });
 

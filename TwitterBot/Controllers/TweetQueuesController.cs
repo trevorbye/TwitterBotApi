@@ -21,7 +21,7 @@ namespace TwitterBot.Controllers
     {
         private TwitterBotContext db = new TwitterBotContext();
 
-        [Route("get-user-tweet-queue")]
+        [Route("api/get-user-tweet-queue")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetUserTweetQueue()
         {
@@ -31,7 +31,7 @@ namespace TwitterBot.Controllers
             return Ok(tweets);
         }
 
-        [Route("get-distinct-handles")]
+        [Route("api/get-distinct-handles")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetDistinctHandles()
         {

@@ -21,7 +21,7 @@ namespace TwitterBot.Controllers
             }
         }
 
-        [Route("twitter-auth-token")]
+        [Route("api/twitter-auth-token")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetTwitterOauthString()
         {
@@ -67,6 +67,14 @@ namespace TwitterBot.Controllers
             var content = response.Content.ReadAsStringAsync().Result;
             string authToken = content.Substring(content.IndexOf("oauth_token=") + 12, content.IndexOf("&oauth_token_secret") - 12);
             return Ok(authToken);
+        }
+
+        [Route("api/convert-to-access-token")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult GetTwitterAccessToken(string token, string verifier)
+        {
+            string bp = "";
+            return null;
         }
     }
 }
