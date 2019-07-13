@@ -73,7 +73,52 @@ namespace TwitterBot.Controllers
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetTwitterAccessToken(string token, string verifier)
         {
-            string bp = "";
+            string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
+            string oauthConsumerKey = WebUtility.UrlEncode("OmlAUrh2VxAKX6Qp2bYzwxBwI");
+            string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
+            string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
+            string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            string version = WebUtility.UrlEncode("1.0");
+            string oauthToken = WebUtility.UrlEncode(token);
+            string oauthVerifier = WebUtility.UrlEncode(verifier);
+
+            string paramString =
+                "oauth_consumer_key=" + oauthConsumerKey + "&" +
+                "oauth_nonce=" + oauthNonce + "&" +
+                "oauth_signature_method=" + sigMethod + "&" +
+                "oauth_timestamp=" + timestamp + "&" +
+                "oauth_token=" + oauthToken + "&" +
+                "oauth_verifier=" + oauthVerifier + "&" +
+                "oauth_version=" + version;
+
+            string signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
+            string signingKey = "4HmFBAX1w6xuz4onP0lHwq7ANMQ6vswEokIiNnJY6kHuUd51ek" + "&" + oauthToken;
+            string oauthSignature = ShaHash(signatureBaseString, signingKey);
+
+            string authString = "OAuth " +
+                "oauth_consumer_key=" + "\"" + oauthConsumerKey + "\"" + ", " +
+                "oauth_nonce=" + "\"" + oauthNonce + "\"" + ", " +
+                "oauth_signature=" + "\"" + WebUtility.UrlEncode(oauthSignature) + "\"" + ", " +
+                "oauth_signature_method=" + "\"" + sigMethod + "\"" + ", " +
+                "oauth_timestamp=" + "\"" + timestamp + "\"" + ", " +
+                "oauth_token=" + "\"" + oauthToken + "\"" + ", " +
+                "oauth_verifier=" + "\"" + oauthVerifier + "\"" + ", " +
+                "oauth_version=" + "\"" + version + "\"";
+
+            HttpClient client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage
+            {
+                RequestUri = new Uri("https://api.twitter.com/oauth/access_token"),
+                Method = HttpMethod.Post,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), authString}
+                }
+            };
+            var response = client.SendAsync(request).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
+            
+
             return null;
         }
     }
