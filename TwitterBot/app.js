@@ -21,6 +21,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             templateUrl: 'templates/tweets.html',
             controller: 'tweets',
             controllerAs: 'controller'
+        }).when('/management-portal', {
+            templateUrl: 'templates/manage.html',
+            controller: 'manage',
+            controllerAs: 'controller'
         });
 
         $locationProvider.html5Mode(true);
@@ -71,6 +75,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.handles = [];
         $scope.tweetSubmitObject = {};
 
+        //accepts url?oauth_token=TOKEN&oauth_verifier=TOKEN
         var oauthToken = $routeParams.oauth_token;
         var oauthVerifier = $routeParams.oauth_verifier;
 
@@ -102,5 +107,29 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             });
     });
 
+    twitterBot.controller("manage", function ($rootScope, $http, $location, $scope, $routeParams) {
+
+        $scope.twitterSignIn = function () {
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get("twitter-auth-token", config).then(function (response) {
+                        
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+    });
 
 })();
