@@ -5,14 +5,19 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using TwitterBot.Models;
+using TwitterBot.POCOS;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
+using System.Security.Claims;
 
 namespace TwitterBot.Controllers
 {
     [Authorize]
     public class AppController : ApiController
     {
+        private TwitterBotContext db = new TwitterBotContext();
+
         private string ShaHash(string value, string signingKey)
         {
             using (var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)))
@@ -65,7 +70,8 @@ namespace TwitterBot.Controllers
             };
             var response = client.SendAsync(request).Result;
             var content = response.Content.ReadAsStringAsync().Result;
-            string authToken = content.Substring(content.IndexOf("oauth_token=") + 12, content.IndexOf("&oauth_token_secret") - 12);
+            var parsed = HttpUtility.ParseQueryString(content);
+            string authToken = parsed["oauth_token"];
             return Ok(authToken);
         }
 
@@ -73,6 +79,9 @@ namespace TwitterBot.Controllers
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetTwitterAccessToken(string token, string verifier)
         {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string principle = Utilities.UsernameFromClaims(claims);
+
             string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
             string oauthConsumerKey = WebUtility.UrlEncode("OmlAUrh2VxAKX6Qp2bYzwxBwI");
             string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
@@ -117,9 +126,32 @@ namespace TwitterBot.Controllers
             };
             var response = client.SendAsync(request).Result;
             var content = response.Content.ReadAsStringAsync().Result;
-            
+            var parsed = HttpUtility.ParseQueryString(content);
 
-            return null;
+            TwitterAccount twitterAccount = new TwitterAccount
+            {
+                HandleUser = principle,
+                TwitterHandle = "@" + parsed["screen_name"],
+                TwitterUserId = long.Parse(parsed["user_id"]),
+                OauthToken = parsed["oauth_token"],
+                OauthSecret = parsed["oauth_secret"]
+            };
+
+            //check if account has already been added
+            IList<TwitterAccount> accounts = db.TwitterAccounts.Where(
+                table => table.TwitterHandle == twitterAccount.TwitterHandle).ToList();
+
+            if (accounts.Count == 0)
+            {
+                db.TwitterAccounts.Add(twitterAccount);
+                db.SaveChanges();
+                return Ok(twitterAccount.TwitterHandle);
+            }
+            else
+            {
+                return BadRequest(twitterAccount.TwitterHandle);
+            }
+            
         }
     }
 }

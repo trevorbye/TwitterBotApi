@@ -35,7 +35,7 @@ namespace TwitterBot.Controllers
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetDistinctHandles()
         {
-            IList<string> distinctHandles = db.TweetQueues.Select(table => table.TwitterHandle).Distinct().ToList();
+            IList<string> distinctHandles = db.TwitterAccounts.Select(table => table.TwitterHandle).Distinct().ToList();
             return Ok(distinctHandles);
         }
 

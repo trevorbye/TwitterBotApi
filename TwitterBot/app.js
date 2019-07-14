@@ -133,6 +133,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     });
 
     twitterBot.controller("redirect", function ($http, $location, $scope, $routeParams) {
+        $scope.waiting = true;
+        $scope.handle = "";
+        $scope.success = false;
+        $scope.failure = false;
 
         //parses url?oauth_token=TOKEN&oauth_verifier=TOKEN
         var oauthToken = $routeParams.oauth_token;
@@ -156,7 +160,14 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 };
 
                 $http.get("api/convert-to-access-token", config).then(function (response) {
+                    $scope.handle = response.data;
+                    $scope.waiting = false;
+                    $scope.success = true;
                     
+                }, function (response) {
+                    $scope.handle = response.data.Message;
+                    $scope.waiting = false;
+                    $scope.failure = true;
                 });
 
             }, function (error) {

@@ -3,9 +3,15 @@
 
         <div class="card text-center" id="redirect-card">
             <div class="card-body">
-                <i class="far fa-check-circle fa-4x mb-3"></i>
-                <h4 class="mt-3">Twitter account successfully added</h4>
-                <a href="" class="btn btn-primary mt-3" ng-click="backToPortal()">Return to portal</a>
+                <i class="fas fa-spinner fa-pulse fa-4x" ng-show="waiting"></i>
+
+                <i class="far fa-check-circle fa-4x mb-3" ng-show="!waiting && success"></i>
+                <h4 class="mt-3" ng-show="!waiting && success">{{handle}} successfully added.</h4>
+
+                <i class="fas fa-exclamation-triangle fa-4x mb-3" ng-show="!waiting && failure"></i>
+                <h4 class="mt-3" ng-show="!waiting && failure">{{handle}} already exists.</h4>
+
+                <a href="" class="btn btn-primary mt-3" ng-click="backToPortal()" ng-show="!waiting">Return to portal</a>
             </div>
         </div>
 

@@ -153,6 +153,7 @@
     <Compile Include="Models\AdminManager.cs" />
     <Compile Include="Models\RestTest.cs" />
     <Compile Include="Models\TweetQueue.cs" />
+    <Compile Include="Models\TwitterAccount.cs" />
     <Compile Include="Models\TwitterBotContext.cs" />
     <Compile Include="POCOS\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
