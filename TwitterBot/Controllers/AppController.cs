@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -152,6 +153,24 @@ namespace TwitterBot.Controllers
                 return BadRequest(twitterAccount.TwitterHandle);
             }
             
+        }
+
+        [Route("api/get-user-twitter-accounts")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult GetUserTwitterAccounts()
+        {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string principle = Utilities.UsernameFromClaims(claims);
+
+            IList<TwitterAccount> accounts = db.TwitterAccounts.Where(
+                table => table.HandleUser == principle).ToList();
+
+            IList<string> handles = new List<string>();
+            foreach (TwitterAccount account in accounts)
+            {
+                handles.Add(account.TwitterHandle);
+            }
+            return Ok(handles);
         }
     }
 }

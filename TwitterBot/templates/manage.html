@@ -1,8 +1,61 @@
 ﻿<div class="row">
-    <h3 class="mr-3">Add new Twitter account</h3>
-    <span>
+
+    <div class="col-md-4 mb-3">
+        <h2 class="mb-3">Add new account</h2>
+        <p class="mb-3">
+            Add a new Twitter account to allow other users to request to post to the account, pending approval.
+            Adding an account also allows you to configure automatic retweeting of @mentions, with a sentiment
+            filter enabled. Nothing will be posted to this account without your consent, and you can remove the
+            account at any time either in this app or via your Twitter application permissions. If you are
+            currently logged into Twitter, that account will automatically be authenticated upon pressing
+            the button below. Log out of Twitter or sign into a different account to add a different handle.
+        </p>
+
         <button class="btn btn-light" ng-click="twitterSignIn()">
             <i class="fab fa-twitter fa-md twitter"></i> Sign in with Twitter
         </button>
-    </span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <h2 class="mb-3">Your Twitter accounts</h2>
+        <p class="mb-3">
+            These are your current Twitter accounts registered within this application. Click <b>Edit</b> to
+            edit settings for an account. Configurable settings include enabling/disabling automated mention
+            retweets, granting permissions to Microsoft internal users to post to your account, and account deletion.
+        </p>
+
+        <div class="list-group">
+            <div ng-repeat="handle in handles" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <h5 class="mt-2 handles">{{handle}}</h5>
+                    <button class="btn btn-primary">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <h2 class="mb-3">Your Tweet queue</h2>
+        <p class="mb-3">
+            These are all current Tweets that users have requested to post to any of your configured Twitter accounts.
+            Either approve/deny the request to post the Tweet at the scheduled time. You can also cancel the request entirely,
+            up until the scheduled post time.
+        </p>
+
+        <div class="list-group">
+            <div ng-repeat="tweet in tweetQueue" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <h5 class="handles">{{tweet.TwitterHandle}}</h5>
+                    <small>{{tweet.CreatedTime}}</small>
+                </div>
+                <p class="mb-1">{{tweet.StatusBody}}</p>
+                <div class="d-flex w-100 justify-content-between">
+                    <small>Scheduled For: {{tweet.ScheduledStatusTime}}</small>
+                    <small>MSFT User: {{tweet.TweetUser}}</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>

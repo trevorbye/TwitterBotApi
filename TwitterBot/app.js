@@ -78,6 +78,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.tweetQueue = [];
         $scope.handles = [];
         $scope.tweetSubmitObject = {};
+        $scope.error = false;
+        $scope.errorMessage = "";
 
         clientApplication.acquireTokenSilent([clientId])
             .then(function (token) {
@@ -90,12 +92,12 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                 $http.get("api/get-user-tweet-queue", config).then(function (response) {
                     $scope.tweetQueue = response.data;
-                    $scope.$apply();
+                    $scope.apply;
                 });
 
                 $http.get("api/get-distinct-handles", config).then(function (response) {
                     $scope.handles = response.data;
-                    $scope.$apply();
+                    $scope.apply;
                 });
 
             }, function (error) {
@@ -105,9 +107,39 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                 });
             });
+
+        $scope.submitTweet = function () {
+            if ($scope.tweetSubmitObject.handle == null) {
+                $scope.error = true;
+                $scope.errorMessage = "Handle cannot be empty."
+            }
+        };
+
     });
 
-    twitterBot.controller("manage", function ($rootScope, $http, $location, $scope, $routeParams, $window) {
+    twitterBot.controller("manage", function ($http, $location, $scope, $window) {
+        $scope.handles = [];
+        $scope.tweetQueue = [];
+
+        clientApplication.acquireTokenSilent([clientId])
+            .then(function (token) {
+                var config = {
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    }
+                };
+
+                $http.get("api/get-user-twitter-accounts", config).then(function (response) {
+                    $scope.handles = response.data;
+                });
+            }, function (error) {
+                clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                }, function (error) {
+
+                });
+            });
 
         $scope.twitterSignIn = function () {
             clientApplication.acquireTokenSilent([clientId])

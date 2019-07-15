@@ -32,7 +32,12 @@
             <input type="date" max="3000-12-31" min="1000-01-01" class="form-control" ng-model="tweetSubmitObject.date">
             <input type="time" class="form-control" ng-model="tweetSubmitObject.time" />
         </div>
+
         <button type="button" class="btn btn-success mb-3" ng-click="submitTweet()">Create Tweet</button>
+
+        <div class="alert alert-danger" role="alert" ng-show="error">
+            <strong>Oops!</strong> {{errorMessage}}
+        </div>
     </div>
 
     <div class="col-md-6">
@@ -44,7 +49,7 @@
 
         <div class="list-group">
             <div ng-repeat="x in tweetQueue" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
+                <div class="d-flex w-100 justify-content-between align-items-center">
                     <h5 class="mb-1 handles">{{x.TwitterHandle}}</h5>
                     <small>{{x.CreatedTime}}</small>
                 </div>
