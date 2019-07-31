@@ -109,10 +109,37 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             });
 
         $scope.submitTweet = function () {
+            // client side validation for null fields
             if ($scope.tweetSubmitObject.handle == null) {
                 $scope.error = true;
-                $scope.errorMessage = "Handle cannot be empty."
+                $scope.errorMessage = "Handle cannot be empty.";
+            } else if ($scope.tweetSubmitObject.body == null) {
+                $scope.error = true;
+                $scope.errorMessage = "Tweet body cannot be empty.";
+            } else if ($scope.tweetSubmitObject.date == null) {
+                $scope.error = true;
+                $scope.errorMessage = "Date cannot be empty.";
+            } else if ($scope.tweetSubmitObject.time == null) {
+                $scope.error = true;
+                $scope.errorMessage = "Time cannot be empty.";
             }
+
+            if ($scope.tweetSubmitObject.body.length > 280) {
+                $scope.error = true;
+                $scope.errorMessage = "Tweet body exceeds 280 character limit.";
+            }
+
+            var date = new Date($scope.tweetSubmitObject.date);
+            var time = new Date($scope.tweetSubmitObject.time);
+            date.setHours(time.getHours(), time.getMinutes());
+
+            if (date < Date.now()) {
+                $scope.error = true;
+                $scope.errorMessage = "Scheduled Tweet time must be in the future.";
+            }
+
+            console.log(Date.now());
+
         };
 
     });
