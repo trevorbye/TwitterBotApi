@@ -39,6 +39,27 @@ namespace TwitterBot.Controllers
             return Ok(distinctHandles);
         }
 
+        [Route("api/delete-tweet")]
+        [System.Web.Http.HttpDelete]
+        public IHttpActionResult DeleteTweet(int id)
+        {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string user = Utilities.UsernameFromClaims(claims);
+
+            // find tweet by id, make sure claims user == tweet user
+            TweetQueue tweetQueue = db.TweetQueues.Find(id);
+            if (tweetQueue.TweetUser == user)
+            {
+                db.TweetQueues.Remove(tweetQueue);
+                db.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
         [Route("api/post-new-tweet")]
         [System.Web.Http.HttpPost]
         public IHttpActionResult PostNewTweet(TweetQueue tweetQueue)

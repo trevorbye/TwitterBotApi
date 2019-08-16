@@ -44,7 +44,7 @@
         <h2 class="mb-3">Your tweet queue</h2>
         <p class="mb-3">
             View your current queue of Tweets. The icons indicate whether or not the handle owner has accepted your request.
-            You can cancel unapproved Tweets, or cancel approved Tweets up until the scheduled status time.
+            You can <b>Cancel</b> unapproved Tweets, and <b>Cancel</b> approved Tweets up until the scheduled status time.
         </p>
 
         <div class="list-group">
@@ -56,7 +56,11 @@
                 <p class="mb-1">{{x.StatusBody}}</p>
                 <div class="d-flex w-100 justify-content-between">
                     <small>Scheduled For: {{x.ScheduledStatusTime}}</small>
-                    <span><i ng-show="!x.IsApprovedByHandle" class="fas fa-times-circle fa-lg"></i><i ng-show="x.IsApprovedByHandle" class="fas fa-check fa-lg"></i></span>
+                    <span>
+                        <button type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(x.Id, $index)">Cancel</button>
+                        <i ng-show="!x.IsApprovedByHandle" class="fas fa-times-circle fa-lg" style="vertical-align: middle;"></i>
+                        <i ng-show="x.IsApprovedByHandle" class="fas fa-check fa-lg" style="vertical-align: middle;"></i>
+                    </span>
                 </div>
             </div>
         </div>

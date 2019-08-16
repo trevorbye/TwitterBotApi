@@ -171,6 +171,31 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
         };
 
+        $scope.cancelTweet = function (tweetId, index) {
+
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.delete("api/delete-tweet?id=" + tweetId, config).then(function (response) {
+                        $scope.tweetQueue.splice(index, 1);
+                        $scope.apply;
+                    });
+
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
     });
 
     twitterBot.controller("manage", function ($http, $location, $scope, $window) {
