@@ -135,7 +135,7 @@ namespace TwitterBot.Controllers
                 TwitterHandle = "@" + parsed["screen_name"],
                 TwitterUserId = long.Parse(parsed["user_id"]),
                 OauthToken = parsed["oauth_token"],
-                OauthSecret = parsed["oauth_secret"]
+                OauthSecret = parsed["oauth_token_secret"]
             };
 
             //check if account has already been added

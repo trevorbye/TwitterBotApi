@@ -138,7 +138,36 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 $scope.errorMessage = "Scheduled Tweet time must be in the future.";
             }
 
-            console.log(Date.now());
+            var tweetQueueObject = {
+                "TwitterHandle": $scope.tweetSubmitObject.handle,
+                "ScheduledStatusTime": date,
+                "StatusBody": $scope.tweetSubmitObject.body
+            }
+
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
+                        var tweetObject = response.data;
+                        tweetObject.CreatedTime = "Just now";
+
+                        $scope.tweetQueue.unshift(tweetObject);
+                        $scope.tweetSubmitObject = {};
+                        $scope.apply;
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
 
         };
 

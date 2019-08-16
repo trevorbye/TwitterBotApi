@@ -39,6 +39,31 @@ namespace TwitterBot.Controllers
             return Ok(distinctHandles);
         }
 
+        [Route("api/post-new-tweet")]
+        [System.Web.Http.HttpPost]
+        public IHttpActionResult PostNewTweet(TweetQueue tweetQueue)
+        {
+            //get user from auth claim
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string user = Utilities.UsernameFromClaims(claims);
+            tweetQueue.TweetUser = user;
+
+            // find twitter account user
+            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == tweetQueue.TwitterHandle).FirstOrDefault();
+            tweetQueue.HandleUser = account.HandleUser;
+
+            // populate last few object fields
+            tweetQueue.CreatedTime = DateTime.UtcNow;
+            tweetQueue.IsApprovedByHandle = false;
+            tweetQueue.IsCanceledByHandle = false;
+
+            db.TweetQueues.Add(tweetQueue);
+            db.SaveChanges();
+
+            tweetQueue.HandleUser = null;
+            return Ok(tweetQueue);
+        }
+
         // GET: api/TweetQueues/5
         [ResponseType(typeof(TweetQueue))]
         public async Task<IHttpActionResult> GetTweetQueue(int id)
