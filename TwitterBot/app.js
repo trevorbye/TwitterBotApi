@@ -90,9 +90,40 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     }
                 };
 
-                $http.get("api/get-user-tweet-queue", config).then(function (response) {
-                    $scope.tweetQueue = response.data;
-                    $scope.apply;
+                $http.get("api/get-utc-now").then(function (utcRes) {
+                    $http.get("api/get-user-tweet-queue", config).then(function (response) {
+
+                        var utcNow = Date.parse(utcRes.data);
+                        var tweets = response.data;
+                        var index;
+
+                        for (index = 0; index < tweets.length; ++index) {
+                            var tweet = tweets[index]
+                            var utcTweetTime = Date.parse(tweet.CreatedTime + "Z");
+                            var elapsedTimeSeconds = (utcNow - utcTweetTime) / 1000;
+
+                            var humanReadableTime;
+                            if (elapsedTimeSeconds < 60) {
+                                humanReadableTime = "Just now";
+                            } else if (elapsedTimeSeconds < 3600) {
+                                var elapsedMinRounded = Math.round(elapsedTimeSeconds / 60);
+                                humanReadableTime = elapsedMinRounded.toString() + " min ago";
+                            } else if (elapsedTimeSeconds < 86400) {
+                                var elapsedHoursRounded = Math.round(elapsedTimeSeconds / 3600);
+                                humanReadableTime = elapsedHoursRounded.toString() + " hours ago";
+                            } else {
+                                var elapsedDaysRounded = Math.round(elapsedTimeSeconds / 86400);
+                                humanReadableTime = elapsedDaysRounded.toString() + " days ago";
+                            }
+                            tweet.CreatedTime = humanReadableTime;
+                            
+                            var statusTimeUtc = tweet.ScheduledStatusTime + "Z";
+                            tweet.ScheduledStatusTime = new Date(statusTimeUtc).toLocaleString();
+                        }
+
+                        $scope.tweetQueue = tweets;
+                        $scope.apply;
+                    });
                 });
 
                 $http.get("api/get-distinct-handles", config).then(function (response) {
@@ -156,6 +187,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
                         var tweetObject = response.data;
                         tweetObject.CreatedTime = "Just now";
+                        tweetObject.ScheduledStatusTime = date.toLocaleString();
 
                         $scope.tweetQueue.unshift(tweetObject);
                         $scope.tweetSubmitObject = {};
