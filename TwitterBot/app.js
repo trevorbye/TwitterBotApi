@@ -246,6 +246,43 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 $http.get("api/get-user-twitter-accounts", config).then(function (response) {
                     $scope.handles = response.data;
                 });
+
+                $http.get("api/get-utc-now").then(function (utcRes) {
+                    $http.get("api/get-handles-tweet-queue", config).then(function (response) {
+
+                        var utcNow = Date.parse(utcRes.data);
+                        var tweets = response.data;
+                        var index;
+
+                        for (index = 0; index < tweets.length; ++index) {
+                            var tweet = tweets[index]
+                            var utcTweetTime = Date.parse(tweet.CreatedTime + "Z");
+                            var elapsedTimeSeconds = (utcNow - utcTweetTime) / 1000;
+
+                            var humanReadableTime;
+                            if (elapsedTimeSeconds < 60) {
+                                humanReadableTime = "Just now";
+                            } else if (elapsedTimeSeconds < 3600) {
+                                var elapsedMinRounded = Math.round(elapsedTimeSeconds / 60);
+                                humanReadableTime = elapsedMinRounded.toString() + " min ago";
+                            } else if (elapsedTimeSeconds < 86400) {
+                                var elapsedHoursRounded = Math.round(elapsedTimeSeconds / 3600);
+                                humanReadableTime = elapsedHoursRounded.toString() + " hours ago";
+                            } else {
+                                var elapsedDaysRounded = Math.round(elapsedTimeSeconds / 86400);
+                                humanReadableTime = elapsedDaysRounded.toString() + " days ago";
+                            }
+                            tweet.CreatedTime = humanReadableTime;
+
+                            var statusTimeUtc = tweet.ScheduledStatusTime + "Z";
+                            tweet.ScheduledStatusTime = new Date(statusTimeUtc).toLocaleString();
+                        }
+
+                        $scope.tweetQueue = tweets;
+                        $scope.apply;
+                    });
+                });
+                
             }, function (error) {
                 clientApplication.acquireTokenPopup([clientId]).then(function (token) {
 
@@ -253,6 +290,50 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                 });
             });
+
+        $scope.approveTweet = function (tweetId, index) {
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get("api/approve-or-cancel?approveById=" + tweetId + "&cancelById=0", config).then(function (response) {
+                        $scope.tweetQueue[index].IsApprovedByHandle = true;
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
+        $scope.cancelTweet = function (tweetId, index) {
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get("api/approve-or-cancel?cancelById=" + tweetId + "&approveById=0", config).then(function (response) {
+                        $scope.tweetQueue[index].IsApprovedByHandle = false;
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
 
         $scope.twitterSignIn = function () {
             clientApplication.acquireTokenSilent([clientId])

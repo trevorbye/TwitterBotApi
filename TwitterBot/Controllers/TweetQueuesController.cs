@@ -32,12 +32,63 @@ namespace TwitterBot.Controllers
             return Ok(tweets);
         }
 
+        [Route("api/get-handles-tweet-queue")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult GetHandlesTweetQueue()
+        {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string user = Utilities.UsernameFromClaims(claims);
+            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.HandleUser == user)
+                .OrderByDescending(x => x.CreatedTime).ToList();
+            return Ok(tweets);
+        }
+
         [Route("api/get-distinct-handles")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetDistinctHandles()
         {
             IList<string> distinctHandles = db.TwitterAccounts.Select(table => table.TwitterHandle).Distinct().ToList();
             return Ok(distinctHandles);
+        }
+
+        [Route("api/approve-or-cancel")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult ApproveOrCancelTweet(int approveById, int cancelById)
+        {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string user = Utilities.UsernameFromClaims(claims);
+
+            int tweetIdCheck = 0;
+            string operationType = "";
+
+            if (cancelById == 0)
+            {
+                tweetIdCheck = approveById;
+                operationType = "approve";
+            }
+            else
+            {
+                tweetIdCheck = cancelById;
+                operationType = "cancel";
+            }
+
+            TweetQueue tweetQueue = db.TweetQueues.Find(tweetIdCheck);
+            if (tweetQueue.HandleUser != user)
+            {
+                return BadRequest();
+            }
+
+            if (operationType == "approve")
+            {
+                tweetQueue.IsApprovedByHandle = true;
+            }
+            else
+            {
+                tweetQueue.IsApprovedByHandle = false;
+            }
+
+            db.SaveChanges();
+            return Ok();
         }
 
         [Route("api/delete-tweet")]
@@ -84,99 +135,6 @@ namespace TwitterBot.Controllers
 
             tweetQueue.HandleUser = null;
             return Ok(tweetQueue);
-        }
-
-        // GET: api/TweetQueues/5
-        [ResponseType(typeof(TweetQueue))]
-        public async Task<IHttpActionResult> GetTweetQueue(int id)
-        {
-            TweetQueue tweetQueue = await db.TweetQueues.FindAsync(id);
-            if (tweetQueue == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(tweetQueue);
-        }
-
-        // PUT: api/TweetQueues/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutTweetQueue(int id, TweetQueue tweetQueue)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != tweetQueue.Id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(tweetQueue).State = EntityState.Modified;
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TweetQueueExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        // POST: api/TweetQueues
-        [ResponseType(typeof(TweetQueue))]
-        public async Task<IHttpActionResult> PostTweetQueue(TweetQueue tweetQueue)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            db.TweetQueues.Add(tweetQueue);
-            await db.SaveChangesAsync();
-
-            return CreatedAtRoute("DefaultApi", new { id = tweetQueue.Id }, tweetQueue);
-        }
-
-        // DELETE: api/TweetQueues/5
-        [ResponseType(typeof(TweetQueue))]
-        public async Task<IHttpActionResult> DeleteTweetQueue(int id)
-        {
-            TweetQueue tweetQueue = await db.TweetQueues.FindAsync(id);
-            if (tweetQueue == null)
-            {
-                return NotFound();
-            }
-
-            db.TweetQueues.Remove(tweetQueue);
-            await db.SaveChangesAsync();
-
-            return Ok(tweetQueue);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        private bool TweetQueueExists(int id)
-        {
-            return db.TweetQueues.Count(e => e.Id == id) > 0;
         }
     }
 }

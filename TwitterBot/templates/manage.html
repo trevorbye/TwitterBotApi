@@ -49,9 +49,18 @@
                     <small>{{tweet.CreatedTime}}</small>
                 </div>
                 <p class="mb-1">{{tweet.StatusBody}}</p>
-                <div class="d-flex w-100 justify-content-between">
+                <div class="d-flex w-100 justify-content-between mt-2">
                     <small>Scheduled For: {{tweet.ScheduledStatusTime}}</small>
                     <small>MSFT User: {{tweet.TweetUser}}</small>
+                </div>
+                <div class="mt-2">
+                    <span>
+                        <button ng-show="!tweet.IsApprovedByHandle" type="button" class="btn btn-primary btn-sm" ng-click="approveTweet(tweet.Id, $index)">Approve</button>
+                        <button ng-show="tweet.IsApprovedByHandle" type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Cancel</button>
+
+                        <i ng-show="!tweet.IsApprovedByHandle" class="fas fa-times-circle fa-lg" style="vertical-align: middle;"></i>
+                        <i ng-show="tweet.IsApprovedByHandle" class="fas fa-check fa-lg" style="vertical-align: middle;"></i>
+                    </span>
                 </div>
             </div>
         </div>
