@@ -27,7 +27,8 @@ namespace TwitterBot.Controllers
         {
             IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
             string user = Utilities.UsernameFromClaims(claims);
-            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user).ToList();
+            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user)
+                .OrderByDescending(x => x.CreatedTime).ToList();
             return Ok(tweets);
         }
 
