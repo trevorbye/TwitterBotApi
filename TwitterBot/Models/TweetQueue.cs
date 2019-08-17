@@ -31,6 +31,6 @@ namespace TwitterBot.Models
         public string StatusBody { get; set; }
 
         public bool IsApprovedByHandle { get; set; }
-        public bool IsCanceledByHandle { get; set; }
+
     }
 }

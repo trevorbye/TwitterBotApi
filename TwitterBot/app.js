@@ -288,12 +288,12 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 };
 
                 $http.get("api/get-user-twitter-accounts", config).then(function (response) {
-                    var handleList = response.data;
+                    var accounts = response.data;
                     var index = 0;
                     var uiList = [];
-                    for (index = 0; index < handleList.length; index++) {
-                        var handle = handleList[index];
-                        var uiHandleObject = { "handle": handle, "settings": false };
+                    for (index = 0; index < accounts.length; index++) {
+                        var account = accounts[index];
+                        var uiHandleObject = { "handle": account.TwitterHandle, "settings": false, "retweet": account.IsAutoRetweetEnabled };
                         uiList.push(uiHandleObject);
                     }
 

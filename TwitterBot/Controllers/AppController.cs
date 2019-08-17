@@ -135,7 +135,8 @@ namespace TwitterBot.Controllers
                 TwitterHandle = "@" + parsed["screen_name"],
                 TwitterUserId = long.Parse(parsed["user_id"]),
                 OauthToken = parsed["oauth_token"],
-                OauthSecret = parsed["oauth_token_secret"]
+                OauthSecret = parsed["oauth_token_secret"],
+                IsAutoRetweetEnabled = false
             };
 
             //check if account has already been added
@@ -151,6 +152,26 @@ namespace TwitterBot.Controllers
             else
             {
                 return BadRequest(twitterAccount.TwitterHandle);
+            }
+        }
+
+        [Route("api/get-retweet-status")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult GetAccountRetweetStatus(string handle) {
+
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string principle = Utilities.UsernameFromClaims(claims);
+
+            //ensure principle owns the handle
+            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == handle)
+                .FirstOrDefault();
+            if (account.HandleUser != principle)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(account.IsAutoRetweetEnabled);
             }
         }
 
@@ -186,12 +207,15 @@ namespace TwitterBot.Controllers
             IList<TwitterAccount> accounts = db.TwitterAccounts.Where(
                 table => table.HandleUser == principle).ToList();
 
-            IList<string> handles = new List<string>();
+            IList<TwitterAccount> returnAccounts = new List<TwitterAccount>();
             foreach (TwitterAccount account in accounts)
             {
-                handles.Add(account.TwitterHandle);
+                TwitterAccount returnAccount = new TwitterAccount();
+                returnAccount.TwitterHandle = account.TwitterHandle;
+                returnAccount.IsAutoRetweetEnabled = account.IsAutoRetweetEnabled;
+                returnAccounts.Add(returnAccount);
             }
-            return Ok(handles);
+            return Ok(returnAccounts);
         }
     }
 }

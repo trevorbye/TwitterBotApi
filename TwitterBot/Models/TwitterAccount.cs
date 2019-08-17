@@ -29,13 +29,16 @@ namespace TwitterBot.Models
         [MaxLength(100)]
         public string OauthSecret { get; set; }
 
-        public TwitterAccount(string handle, long twitterUserId, string handleUser, string oauthToken, string  oauthSecret)
+        public bool IsAutoRetweetEnabled { get; set; }
+
+        public TwitterAccount(string handle, long twitterUserId, string handleUser, string oauthToken, string  oauthSecret, bool enableRetweets)
         {
             TwitterHandle = handle;
             TwitterUserId = twitterUserId;
             HandleUser = handleUser;
             OauthToken = oauthToken;
             OauthSecret = oauthSecret;
+            IsAutoRetweetEnabled = enableRetweets;
         }
 
         public TwitterAccount() { }
