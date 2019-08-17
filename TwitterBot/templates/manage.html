@@ -20,7 +20,7 @@
         <p class="mb-3">
             These are your current Twitter accounts registered within this application. Click <b>Settings</b> next to
             each handle to edit account settings. Configurable settings include enabling/disabling automated mention
-            retweets, granting permissions to Microsoft internal users to post to your account, and account deletion.
+            retweets, and account deletion.
         </p>
 
         <div class="list-group">
@@ -57,11 +57,17 @@
                     <small>{{tweet.CreatedTime}}</small>
                 </div>
                 <p class="mb-1">{{tweet.StatusBody}}</p>
-                <div class="d-flex w-100 justify-content-between mt-2">
-                    <small>Scheduled For: {{tweet.ScheduledStatusTime}}</small>
-                    <small>MSFT User: {{tweet.TweetUser}}</small>
+                <div class="d-flex w-100 justify-content-between mt-2 mb-3">
+                    <span>
+                        <i class="far fa-clock fa-sm" style="vertical-align: middle;"></i>
+                        <small class="my-auto">{{tweet.ScheduledStatusTime}}</small>
+                    </span>
+                    <span>
+                        <i class="fas fa-user fa-sm" style="vertical-align: middle;"></i>
+                        <small class="my-auto">{{tweet.TweetUser}}</small>
+                    </span>
                 </div>
-                <div class="mt-2">
+                <div class="mt-3">
                     <span>
                         <button ng-show="!tweet.IsApprovedByHandle" type="button" class="btn btn-primary btn-sm" ng-click="approveTweet(tweet.Id, $index)">Approve</button>
                         <button ng-show="tweet.IsApprovedByHandle" type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Cancel</button>
@@ -72,7 +78,5 @@
                 </div>
             </div>
         </div>
-
     </div>
-
 </div>

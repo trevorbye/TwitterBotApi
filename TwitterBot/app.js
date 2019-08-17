@@ -14,6 +14,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
     twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
         $routeProvider.when('/', {
+            templateUrl: 'templates/login.html',
+            controller: 'login',
+            controllerAs: 'controller'
+        }).when('/home', {
             templateUrl: 'templates/home.html',
             controller: 'home',
             controllerAs: 'controller'
@@ -40,26 +44,59 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $locationProvider.html5Mode(true);
     });
 
-    twitterBot.controller("navcontroller", function ($rootScope, $http, $location, $scope) {
-        $scope.loggedIn = false;
-        $scope.user = "";
+    // locking down templates. "real" auth is on back end, this just makes sure unauthenticated users
+    // don't see empty html templates
+    twitterBot.run(['$rootScope', '$location', function ($rootScope, $location) {
+        $rootScope.$on('$routeChangeStart', function (event) {
+
+            console.log("route changed")
+           
+            if ($location.path() != "/") {
+                console.log("inner loop accessed")
+                if ($rootScope.loggedIn == false) {
+                    console.log('DENY');
+                    event.preventDefault();
+                    $location.path("/");
+                }
+            }
+        });
+    }]);
+
+    twitterBot.controller("login", function ($rootScope, $http, $location, $scope) {
 
         //on site load check if active token already exists in cache, then set ui auth state
         var cachedUser = clientApplication.getUser();
         if (cachedUser != null) {
-            $scope.user = cachedUser.name;
-            $scope.loggedIn = true;
-        } 
+            $location.path("/home");
+            $scope.$apply();
+            $rootScope.$apply();
+        }
 
         $scope.login = function () {
             clientApplication.loginPopup().then(function (token) {
-                console.log(token);
                 var user = clientApplication.getUser();
-                $scope.loggedIn = true;
-                $scope.user = user.name;
+                $rootScope.loggedIn = true;
+                $rootScope.user = user.name;
+                
+                $location.path("/home");
                 $scope.$apply();
+                $rootScope.$apply();
+            }).catch(function (error) {
+                console.log(error);
             });
         };
+    });
+
+    twitterBot.controller("navcontroller", function ($rootScope, $http, $location, $scope) {
+        $rootScope.loggedIn = false;
+        $rootScope.user = "";
+
+        //on site load check if active token already exists in cache, then set ui auth state
+        var cachedUser = clientApplication.getUser();
+        if (cachedUser != null) {
+            $rootScope.user = cachedUser.name;
+            $rootScope.loggedIn = true;
+        } 
 
         $scope.logout = function () {
             clientApplication.logout();
@@ -71,6 +108,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     });
 
     twitterBot.controller("home", function ($rootScope, $http, $location, $scope) {
+
         $scope.manage = function () {
             $location.path("/management-portal");
         }

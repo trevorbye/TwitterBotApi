@@ -152,7 +152,6 @@ namespace TwitterBot.Controllers
             {
                 return BadRequest(twitterAccount.TwitterHandle);
             }
-            
         }
 
         [Route("api/delete-twitter-account")]

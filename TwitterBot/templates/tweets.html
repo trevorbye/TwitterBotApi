@@ -55,7 +55,11 @@
                 </div>
                 <p class="mb-1">{{tweet.StatusBody}}</p>
                 <div class="d-flex w-100 justify-content-between mt-2">
-                    <small>Scheduled For: {{tweet.ScheduledStatusTime}}</small>
+                    <span>
+                        <i class="far fa-clock fa-sm" style="vertical-align: middle;"></i>
+                        <small class="my-auto">{{tweet.ScheduledStatusTime}}</small>
+                    </span>
+                    
                     <span>
                         <button type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Cancel</button>
                         <i ng-show="!tweet.IsApprovedByHandle" class="fas fa-times-circle fa-lg" style="vertical-align: middle;"></i>
