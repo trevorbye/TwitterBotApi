@@ -4,11 +4,10 @@
         <h2 class="mb-3">Add new account</h2>
         <p class="mb-3">
             Add a new Twitter account to allow other users to request to post to the account, pending approval.
-            Adding an account also allows you to configure automatic retweeting of @mentions, with a sentiment
-            filter enabled. Nothing will be posted to this account without your consent, and you can remove the
+            Nothing will be posted to this account without your consent, and you can remove the
             account at any time either in this app or via your Twitter application permissions. If you are
-            currently logged into Twitter, that account will automatically be authenticated upon pressing
-            the button below. Log out of Twitter or sign into a different account to add a different handle.
+            currently logged into Twitter, that account will automatically be authenticated. 
+            Log out of Twitter or sign into a different account to add a different handle.
         </p>
 
         <button class="btn btn-light" ng-click="twitterSignIn()">
@@ -19,8 +18,8 @@
     <div class="col-md-4 mb-3">
         <h2 class="mb-3">Your Twitter accounts</h2>
         <p class="mb-3">
-            These are your current Twitter accounts registered within this application. Click <b>Edit</b> to
-            edit settings for an account. Configurable settings include enabling/disabling automated mention
+            These are your current Twitter accounts registered within this application. Click <b>Settings</b> next to
+            each handle to edit account settings. Configurable settings include enabling/disabling automated mention
             retweets, granting permissions to Microsoft internal users to post to your account, and account deletion.
         </p>
 
@@ -47,7 +46,7 @@
         <h2 class="mb-3">Your Tweet queue</h2>
         <p class="mb-3">
             These are all current Tweets that users have requested to post to any of your configured Twitter accounts.
-            Either approve/deny the request to post the Tweet at the scheduled time. You can also cancel the request entirely,
+            Approve the request to post the Tweet at the scheduled time. You can cancel your approval
             up until the scheduled post time.
         </p>
 
