@@ -29,6 +29,12 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             templateUrl: 'templates/twitter-redirect.html',
             controller: 'redirect',
             controllerAs: 'controller'
+        }).when('/not-found', {
+            templateUrl: 'templates/404.html',
+            controller: 'redirect',
+            controllerAs: 'controller'
+        }).otherwise({
+                redirectTo: "/not-found"
         });
 
         $locationProvider.html5Mode(true);
