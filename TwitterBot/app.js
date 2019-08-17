@@ -244,7 +244,16 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 };
 
                 $http.get("api/get-user-twitter-accounts", config).then(function (response) {
-                    $scope.handles = response.data;
+                    var handleList = response.data;
+                    var index = 0;
+                    var uiList = [];
+                    for (index = 0; index < handleList.length; index++) {
+                        var handle = handleList[index];
+                        var uiHandleObject = { "handle": handle, "settings": false };
+                        uiList.push(uiHandleObject);
+                    }
+
+                    $scope.handles = uiList;
                 });
 
                 $http.get("api/get-utc-now").then(function (utcRes) {
@@ -290,6 +299,36 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                 });
             });
+
+        $scope.expandSettings = function (index) {
+            $scope.handles[index].settings = true;
+        };
+
+        $scope.hideSettings = function (index) {
+            $scope.handles[index].settings = false;
+        };
+
+        $scope.deleteAccount = function (handle, index) {
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.delete("api/delete-twitter-account?handle=" + handle, config).then(function (response) {
+                        $scope.handles.splice(index, 1);
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
 
         $scope.approveTweet = function (tweetId, index) {
             clientApplication.acquireTokenSilent([clientId])

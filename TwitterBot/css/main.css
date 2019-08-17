@@ -25,3 +25,11 @@
 .fa-exclamation-triangle {
     color: #ffc107;
 }
+
+.fa-compress {
+    color: #d4d4d4;
+}
+
+.fa-compress:hover {
+    color: #a8a8a8
+}

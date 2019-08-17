@@ -155,6 +155,28 @@ namespace TwitterBot.Controllers
             
         }
 
+        [Route("api/delete-twitter-account")]
+        [System.Web.Http.HttpDelete]
+        public IHttpActionResult DeleteTwitterAccount(string handle)
+        {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string principle = Utilities.UsernameFromClaims(claims);
+
+            //ensure principle owns the handle
+            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == handle)
+                .FirstOrDefault();
+            if (account.HandleUser != principle)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                db.TwitterAccounts.Remove(account);
+                db.SaveChanges();
+                return Ok();
+            }
+        }
+
         [Route("api/get-user-twitter-accounts")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetUserTwitterAccounts()
