@@ -38,6 +38,10 @@
     color: #2b2b2b;
 }
 
-.fa-clock {
+.fa-clock, .fa-toggle-off {
     color: gray;
+}
+
+.fa-toggle-on {
+    color: #007bff;
 }

@@ -48,11 +48,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     // don't see empty html templates
     twitterBot.run(['$rootScope', '$location', function ($rootScope, $location) {
         $rootScope.$on('$routeChangeStart', function (event) {
-
-            console.log("route changed")
            
             if ($location.path() != "/") {
-                console.log("inner loop accessed")
                 if ($rootScope.loggedIn == false) {
                     console.log('DENY');
                     event.preventDefault();
@@ -104,6 +101,14 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
         $scope.home = function () {
             $location.path("/");
+        };
+
+        $scope.manage = function () {
+            $location.path("/management-portal");
+        };
+
+        $scope.tweet = function () {
+            $location.path("/tweet-portal");
         };
     });
 
