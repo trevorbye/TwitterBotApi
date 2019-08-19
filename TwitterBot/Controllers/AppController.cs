@@ -155,9 +155,9 @@ namespace TwitterBot.Controllers
             }
         }
 
-        [Route("api/get-retweet-status")]
+        [Route("api/enable-auto-tweets")]
         [System.Web.Http.HttpGet]
-        public IHttpActionResult GetAccountRetweetStatus(string handle) {
+        public IHttpActionResult EnableAccountRetweetStatus(string handle) {
 
             IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
             string principle = Utilities.UsernameFromClaims(claims);
@@ -171,7 +171,32 @@ namespace TwitterBot.Controllers
             }
             else
             {
-                return Ok(account.IsAutoRetweetEnabled);
+                account.IsAutoRetweetEnabled = true;
+                db.SaveChanges();
+                return Ok();
+            }
+        }
+
+        [Route("api/disable-auto-tweets")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult DisableAccountRetweetStatus(string handle)
+        {
+
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string principle = Utilities.UsernameFromClaims(claims);
+
+            //ensure principle owns the handle
+            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == handle)
+                .FirstOrDefault();
+            if (account.HandleUser != principle)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                account.IsAutoRetweetEnabled = false;
+                db.SaveChanges();
+                return Ok();
             }
         }
 

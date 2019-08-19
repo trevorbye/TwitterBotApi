@@ -357,6 +357,54 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             $scope.handles[index].settings = false;
         };
 
+        $scope.enableAutoTweets = function (handle, index) {
+            $scope.handles[index].retweet = true;
+
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get("api/enable-auto-tweets?handle=" + handle, config).then(function (response) {
+                        
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
+        $scope.disableAutoTweets = function (handle, index) {
+            $scope.handles[index].retweet = false;
+
+            clientApplication.acquireTokenSilent([clientId])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get("api/disable-auto-tweets?handle=" + handle, config).then(function (response) {
+                        
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
         $scope.deleteAccount = function (handle, index) {
             clientApplication.acquireTokenSilent([clientId])
                 .then(function (token) {
@@ -482,8 +530,9 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     $scope.handle = response.data.Message;
                     $scope.waiting = false;
                     $scope.failure = true;
+                    
                 });
-
+                
             }, function (error) {
                 clientApplication.acquireTokenPopup([clientId]).then(function (token) {
 
@@ -493,6 +542,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             });
 
         $scope.backToPortal = function () {
+            // remove token query params
+            $location.search({});
             $location.path("/management-portal");
         };
 
