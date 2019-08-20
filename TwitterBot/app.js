@@ -46,14 +46,15 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
     // locking down templates. "real" auth is on back end, this just makes sure unauthenticated users
     // don't see empty html templates
-    twitterBot.run(['$rootScope', '$location', function ($rootScope, $location) {
+    twitterBot.run(['$rootScope', '$location', "$window", function ($rootScope, $location, $window) {
         $rootScope.$on('$routeChangeStart', function (event) {
            
             if ($location.path() != "/") {
                 if ($rootScope.loggedIn == false) {
                     console.log('DENY');
                     event.preventDefault();
-                    $location.path("/");
+                    //redirect actual window rather than route, otherwise AAD callback uri won't match
+                    $window.location.href = "http://localhost:52937/";
                 }
             }
         });
