@@ -44,7 +44,8 @@
         <h2 class="mb-3">Your tweet queue</h2>
         <p class="mb-3">
             View your current queue of Tweets. The icons indicate whether or not the handle owner has approved your request.
-            You can <b>Cancel</b> both unapproved Tweets, and approved Tweets up until the scheduled status time.
+            You can <b>Delete</b> both approved and unapproved Tweets. The <i class="fab fa-twitter-square fa-lg" style="vertical-align: middle;"></i> indicates
+            that the Tweet has been posted and is safe to delete from your queue.
         </p>
 
         <div class="list-group">
@@ -61,10 +62,13 @@
                     </span>
                     
                     <span>
-                        <button type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Cancel</button>
+                        <button type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Delete</button>
                         <i ng-show="!tweet.IsApprovedByHandle" class="fas fa-times-circle fa-lg" style="vertical-align: middle;"></i>
                         <i ng-show="tweet.IsApprovedByHandle" class="fas fa-check fa-lg" style="vertical-align: middle;"></i>
                     </span>
+                </div>
+                <div class="mt-2">
+                    <i ng-show="tweet.IsPostedByWebJob" class="fab fa-twitter-square fa-lg" style="vertical-align: middle;"></i>
                 </div>
             </div>
         </div>
