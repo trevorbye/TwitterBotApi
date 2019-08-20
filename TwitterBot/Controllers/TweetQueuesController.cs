@@ -128,6 +128,7 @@ namespace TwitterBot.Controllers
             // populate last few object fields
             tweetQueue.CreatedTime = DateTime.UtcNow;
             tweetQueue.IsApprovedByHandle = false;
+            tweetQueue.IsPostedByWebJob = false;
 
             db.TweetQueues.Add(tweetQueue);
             db.SaveChanges();
