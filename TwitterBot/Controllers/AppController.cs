@@ -18,6 +18,7 @@ namespace TwitterBot.Controllers
     public class AppController : ApiController
     {
         private TwitterBotContext db = new TwitterBotContext();
+        private DeployConfig deployConfig = new DeployConfig();
 
         private string ShaHash(string value, string signingKey)
         {
@@ -32,8 +33,8 @@ namespace TwitterBot.Controllers
         public IHttpActionResult GetTwitterOauthString()
         {
             string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/request_token");
-            string oauthCallback = WebUtility.UrlEncode("http://localhost:52937/add-account-redirect");
-            string oauthConsumerKey = WebUtility.UrlEncode("OmlAUrh2VxAKX6Qp2bYzwxBwI");
+            string oauthCallback = WebUtility.UrlEncode(deployConfig.OauthCallbackUrl);
+            string oauthConsumerKey = WebUtility.UrlEncode(deployConfig.OauthConsumerKey);
             string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
             string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
             string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
@@ -47,7 +48,7 @@ namespace TwitterBot.Controllers
                 "oauth_version=" + version;
 
             string signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
-            string signingKey = "4HmFBAX1w6xuz4onP0lHwq7ANMQ6vswEokIiNnJY6kHuUd51ek" + "&";
+            string signingKey = deployConfig.SigningKey + "&";
             string oauthSignature = ShaHash(signatureBaseString, signingKey);
 
             string authString = "OAuth " +
@@ -84,7 +85,7 @@ namespace TwitterBot.Controllers
             string principle = Utilities.UsernameFromClaims(claims);
 
             string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
-            string oauthConsumerKey = WebUtility.UrlEncode("OmlAUrh2VxAKX6Qp2bYzwxBwI");
+            string oauthConsumerKey = WebUtility.UrlEncode(deployConfig.OauthConsumerKey);
             string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
             string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
             string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
@@ -102,7 +103,7 @@ namespace TwitterBot.Controllers
                 "oauth_version=" + version;
 
             string signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
-            string signingKey = "4HmFBAX1w6xuz4onP0lHwq7ANMQ6vswEokIiNnJY6kHuUd51ek" + "&" + oauthToken;
+            string signingKey = deployConfig.SigningKey + "&" + oauthToken;
             string oauthSignature = ShaHash(signatureBaseString, signingKey);
 
             string authString = "OAuth " +

@@ -48,13 +48,22 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     // don't see empty html templates
     twitterBot.run(['$rootScope', '$location', "$window", function ($rootScope, $location, $window) {
         $rootScope.$on('$routeChangeStart', function (event) {
+
+            var deployType = "test";
+            var redirectUri;
+
+            if (deployType == "test") {
+                redirectUri = "http://localhost:52937/";
+            } else {
+                redirectUri = "";
+            }
            
             if ($location.path() != "/") {
                 if ($rootScope.loggedIn == false) {
                     console.log('DENY');
                     event.preventDefault();
                     //redirect actual window rather than route, otherwise AAD callback uri won't match
-                    $window.location.href = "http://localhost:52937/";
+                    $window.location.href = redirectUri;
                 }
             }
         });
