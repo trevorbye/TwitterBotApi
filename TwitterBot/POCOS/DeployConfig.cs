@@ -4,7 +4,7 @@ namespace TwitterBot.POCOS
     public class DeployConfig
     {
         // one of ["test", "prod"]
-        private const string _env = "test";
+        private const string _env = "prod";
         public DeployConfig() { }
 
         public string OauthCallbackUrl { get
@@ -15,7 +15,7 @@ namespace TwitterBot.POCOS
                 }
                 else
                 {
-                    return "";
+                    return "https://mstwitterbot.azurewebsites.net/add-account-redirect";
                 }
             }
         }
@@ -28,7 +28,7 @@ namespace TwitterBot.POCOS
                 }
                 else
                 {
-                    return "";
+                    return "Z56vS7LzR2KlEN44FCGDz6g3g";
                 }
             }
         }
@@ -41,7 +41,7 @@ namespace TwitterBot.POCOS
                 }
                 else
                 {
-                    return "";
+                    return "7WXse93IFMia1Lj3VvGh83L1wCFfJqQM4Cj9mkkZClqHNSfs5M";
                 }
             }
         }

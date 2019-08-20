@@ -49,13 +49,13 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     twitterBot.run(['$rootScope', '$location', "$window", function ($rootScope, $location, $window) {
         $rootScope.$on('$routeChangeStart', function (event) {
 
-            var deployType = "test";
+            var deployType = "prod";
             var redirectUri;
 
             if (deployType == "test") {
                 redirectUri = "http://localhost:52937/";
             } else {
-                redirectUri = "";
+                redirectUri = "https://mstwitterbot.azurewebsites.net/";
             }
            
             if ($location.path() != "/") {
