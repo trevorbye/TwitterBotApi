@@ -8,14 +8,16 @@ namespace TwitterBot.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<TwitterBot.Models.TwitterBotContext>
     {
+        
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
         }
-
+        
         protected override void Seed(TwitterBot.Models.TwitterBotContext context)
         {
             
         }
+        
     }
 }
