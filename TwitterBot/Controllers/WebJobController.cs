@@ -28,7 +28,32 @@ namespace TwitterBot.Controllers
                 return Unauthorized();
             }
 
-            return Ok();
+            DateTime timeNowUtc = DateTime.UtcNow;
+
+            IList<TweetQueue> tweetQueues = db.TweetQueues
+                .Where(table => table.IsApprovedByHandle == true)
+                .Where(table => table.IsPostedByWebJob == false)
+                .Where(table => table.ScheduledStatusTime <= timeNowUtc)
+                .ToList();
+
+            IList<string> uniqueAccounts = new List<string>();
+            foreach (TweetQueue queue in tweetQueues) {
+                if (!uniqueAccounts.Contains(queue.HandleUser))
+                {
+                    uniqueAccounts.Add(queue.HandleUser);
+                }
+            }
+
+            IDictionary<string, TwitterAccount> accountDict = new Dictionary<string, TwitterAccount>();
+            foreach (string handle in uniqueAccounts)
+            {
+                TwitterAccount account = db.TwitterAccounts
+                    .Where(x => x.HandleUser == handle).FirstOrDefault();
+                accountDict.Add(handle, account);
+            }
+
+            TweetQueueAccountReturnEntity returnEntity = new TweetQueueAccountReturnEntity(tweetQueues, accountDict);
+            return Ok(returnEntity);
         }
     }
 }
