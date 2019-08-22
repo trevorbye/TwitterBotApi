@@ -55,5 +55,26 @@ namespace TwitterBot.Controllers
             TweetQueueAccountReturnEntity returnEntity = new TweetQueueAccountReturnEntity(tweetQueues, accountDict);
             return Ok(returnEntity);
         }
+
+        [Route("api/webjob-mark-complete")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult MarkAsWebJobComplete(int tweetQueueId)
+        {
+            string authToken = Request.Headers.Authorization.Parameter;
+            if (authToken != _bearerToken || authToken == null)
+            {
+                return Unauthorized();
+            }
+
+            TweetQueue tweetQueue = db.TweetQueues.Find(tweetQueueId);
+            if (tweetQueue == null)
+            {
+                return BadRequest();
+            }
+            tweetQueue.IsPostedByWebJob = true;
+            db.SaveChanges();
+
+            return Ok(0);
+        }
     }
 }
