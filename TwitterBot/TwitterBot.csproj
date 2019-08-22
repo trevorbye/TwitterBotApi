@@ -167,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\MSTwitterBot - SQL Projects .pubxml" />
     <None Include="Properties\PublishProfiles\MSTwitterBot - Web Deploy.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
     <None Include="Web.Debug.config">
