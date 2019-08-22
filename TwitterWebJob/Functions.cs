@@ -11,9 +11,9 @@ namespace TwitterWebJob
     public class Functions
     {
         [NoAutomaticTrigger]
-        public static void ProcessTweets()
+        public static void ProcessTweets(TextWriter log)
         {
-
+            log.Write("service ran at" + DateTime.UtcNow.ToString());
         }
     }
 }
