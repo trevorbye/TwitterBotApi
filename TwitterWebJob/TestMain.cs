@@ -10,7 +10,7 @@ namespace TwitterWebJob
 {
     class TestMain
     {
-        public static void Main(String[] args)
+        public static void Main0(String[] args)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
             string authString = "Bearer ";
@@ -29,7 +29,11 @@ namespace TwitterWebJob
             WebJobTweetQueueAccountReturnEntity content = response.Content
                 .ReadAsAsync<WebJobTweetQueueAccountReturnEntity>().Result;
 
-            int bp = 0;
+            foreach (WebJobTweetQueue tweetQueue in content.Tweets)
+            {
+
+            }
+
         }
     }
 }
