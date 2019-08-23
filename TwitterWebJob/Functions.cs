@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
+using System.Net.Http;
+
 
 namespace TwitterWebJob
 {
@@ -13,7 +15,8 @@ namespace TwitterWebJob
         [NoAutomaticTrigger]
         public static void ProcessTweets(TextWriter log)
         {
-            log.Write("service ran at" + DateTime.UtcNow.ToString());
+            
+            
         }
     }
 }
