@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using System.Net.Http;
@@ -16,7 +14,7 @@ namespace TwitterWebJob
         public static void ProcessTweets(TextWriter log)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-            string authString = "Bearer ";
+            string bearer = "Bearer ";
             HttpClient client = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage
             {
@@ -24,7 +22,7 @@ namespace TwitterWebJob
                 Method = HttpMethod.Get,
                 Headers =
                 {
-                    {HttpRequestHeader.Authorization.ToString(), authString}
+                    {HttpRequestHeader.Authorization.ToString(), bearer}
                 }
             };
 
@@ -32,10 +30,12 @@ namespace TwitterWebJob
             WebJobTweetQueueAccountReturnEntity content = response.Content
                 .ReadAsAsync<WebJobTweetQueueAccountReturnEntity>().Result;
 
+            IDictionary<string, WebJobTwitterAccount> accountsDict = content.Accounts;
             List<Task> asyncCalls = new List<Task>();
+           
             foreach (WebJobTweetQueue tweetQueue in content.Tweets)
             {
-                asyncCalls.Add(WebActions.SetApproved(tweetQueue.Id));
+                asyncCalls.Add(WebActions.SendTweet(tweetQueue, accountsDict, bearer));
             }
 
             Task.WaitAll(asyncCalls.ToArray());
