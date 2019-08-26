@@ -45,3 +45,7 @@
 .fa-toggle-on {
     color: #007bff;
 }
+
+.wrapped {
+    word-wrap: break-word;
+}
