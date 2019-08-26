@@ -14,7 +14,7 @@ namespace TwitterWebJob
         public static void ProcessTweets(TextWriter log)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-            string bearer = "Bearer ";
+            string bearer = "Bearer 893871c2-65cf-4677-a846-435fe9e5f321";
             HttpClient client = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage
             {

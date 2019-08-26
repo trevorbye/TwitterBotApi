@@ -13,6 +13,17 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     var twitterBot = angular.module('twitterBot', ['ngRoute']);
 
     twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
+        var routeResolve = {
+            "auth": function ($rootScope, $window, $q) {
+                var defer = $q.defer();
+                if ($rootScope.loggedIn == false) {
+                    $window.location.href = "https://mstwitterbot.azurewebsites.net/";
+                }
+                defer.resolve();
+                return defer.promise;
+            }
+        };
+
         $routeProvider.when('/', {
             templateUrl: 'templates/login.html',
             controller: 'login',
@@ -20,54 +31,29 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         }).when('/home', {
             templateUrl: 'templates/home.html',
             controller: 'home',
-            controllerAs: 'controller'
+            resolve: routeResolve
         }).when('/tweet-portal', {
             templateUrl: 'templates/tweets.html',
             controller: 'tweets',
-            controllerAs: 'controller'
+            resolve: routeResolve
         }).when('/management-portal', {
             templateUrl: 'templates/manage.html',
             controller: 'manage',
-            controllerAs: 'controller'
+            resolve: routeResolve
         }).when('/add-account-redirect', {
             templateUrl: 'templates/twitter-redirect.html',
             controller: 'redirect',
-            controllerAs: 'controller'
+            resolve: routeResolve
         }).when('/not-found', {
             templateUrl: 'templates/404.html',
             controller: 'redirect',
-            controllerAs: 'controller'
+            resolve: routeResolve
         }).otherwise({
                 redirectTo: "/not-found"
         });
 
         $locationProvider.html5Mode(true);
     });
-
-    // locking down templates. "real" auth is on back end, this just makes sure unauthenticated users
-    // don't see empty html templates
-    twitterBot.run(['$rootScope', '$location', "$window", function ($rootScope, $location, $window) {
-        $rootScope.$on('$routeChangeStart', function (event) {
-
-            var deployType = "prod";
-            var redirectUri;
-
-            if (deployType == "test") {
-                redirectUri = "http://localhost:52937/";
-            } else {
-                redirectUri = "https://mstwitterbot.azurewebsites.net/";
-            }
-           
-            if ($location.path() != "/") {
-                if ($rootScope.loggedIn == false) {
-                    console.log('DENY');
-                    event.preventDefault();
-                    //redirect actual window rather than route, otherwise AAD callback uri won't match
-                    $window.location.href = redirectUri;
-                }
-            }
-        });
-    }]);
 
     twitterBot.controller("login", function ($rootScope, $http, $location, $scope) {
 
@@ -97,6 +83,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     twitterBot.controller("navcontroller", function ($rootScope, $http, $location, $scope) {
         $rootScope.loggedIn = false;
         $rootScope.user = "";
+
+        $rootScope.manageText = "Manage";
+        $rootScope.tweetText = "Tweet";
+        $rootScope.logoutText = "Logout";
 
         //on site load check if active token already exists in cache, then set ui auth state
         var cachedUser = clientApplication.getUser();
