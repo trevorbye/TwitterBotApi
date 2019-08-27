@@ -88,6 +88,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $rootScope.tweetText = "Tweet";
         $rootScope.logoutText = "Logout";
 
+        // db init request 
+        $http.get("api/init-loader").then(function (response) {
+        });
+
         //on site load check if active token already exists in cache, then set ui auth state
         var cachedUser = clientApplication.getUser();
         if (cachedUser != null) {
