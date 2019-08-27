@@ -49,3 +49,9 @@
 .wrapped {
     word-wrap: break-word;
 }
+
+.scroll-group {
+    max-height: 200px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
