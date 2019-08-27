@@ -113,6 +113,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     });
 
     twitterBot.controller("home", function ($rootScope, $http, $location, $scope) {
+        $rootScope.tweetActive = false;
+        $rootScope.manageActive = false;
 
         $scope.manage = function () {
             $location.path("/management-portal");
@@ -124,6 +126,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     });
 
     twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope, $routeParams) {
+        // set navbar active classes
+        $rootScope.tweetActive = true;
+        $rootScope.manageActive = false;
+
         $scope.tweetQueue = [];
         $scope.handles = [];
         $scope.tweetSubmitObject = {};
@@ -279,7 +285,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
     });
 
-    twitterBot.controller("manage", function ($http, $location, $scope, $window) {
+    twitterBot.controller("manage", function ($http, $location, $scope, $window, $rootScope) {
+        $rootScope.tweetActive = false;
+        $rootScope.manageActive = true;
+
         $scope.handles = [];
         $scope.tweetQueue = [];
 
