@@ -51,7 +51,7 @@
 }
 
 .scroll-group {
-    max-height: 200px;
+    max-height: 350px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
