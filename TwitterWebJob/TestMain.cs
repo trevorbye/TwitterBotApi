@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Net;
 using System.Security.Cryptography;
 
+using System.Net.Mail;
+
 namespace TwitterWebJob
 {
     class TestMain
@@ -17,6 +19,22 @@ namespace TwitterWebJob
             {
                 return Convert.ToBase64String(hmac.ComputeHash(Encoding.ASCII.GetBytes(value)));
             }
+        }
+
+        public static void Main0(String[] args)
+        {
+            SmtpClient client = new SmtpClient("smtp.office365.com", 587);
+            client.Credentials = new NetworkCredential("tweet@microsoft.com", "5tyJ)7jx3220!pWn6");
+            client.EnableSsl = true;
+
+            MailMessage message = new MailMessage();
+            message.From = new MailAddress("tweet@microsoft.com");
+            message.To.Add("trbye@microsoft.com");
+            message.Body = "A test email.";
+            message.Subject = "MS Twitter Bot Notification";
+
+            client.Send(message);
+        
         }
 
         public static void MainTest(String[] args)

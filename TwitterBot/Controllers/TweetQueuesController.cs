@@ -127,6 +127,7 @@ namespace TwitterBot.Controllers
             db.TweetQueues.Add(tweetQueue);
             db.SaveChanges();
 
+            NotificationService.SendNotificationToHandle(tweetQueue);
             tweetQueue.HandleUser = null;
             return Ok(tweetQueue);
         }

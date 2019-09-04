@@ -199,6 +199,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             });
 
         $scope.submitTweet = function () {
+            $scope.error = false;
+
             // client side validation for null fields
             if ($scope.tweetSubmitObject.handle == null) {
                 $scope.error = true;
@@ -228,38 +230,45 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 $scope.errorMessage = "Scheduled Tweet time must be in the future.";
             }
 
-            var tweetQueueObject = {
-                "TwitterHandle": $scope.tweetSubmitObject.handle,
-                "ScheduledStatusTime": date,
-                "StatusBody": $scope.tweetSubmitObject.body
-            }
+            if ($scope.error == false) {
 
-            clientApplication.acquireTokenSilent([clientId])
-                .then(function (token) {
-                    var config = {
-                        headers: {
-                            'Content-type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        }
-                    };
+                var tweetQueueObject = {
+                    "TwitterHandle": $scope.tweetSubmitObject.handle,
+                    "ScheduledStatusTime": date,
+                    "StatusBody": $scope.tweetSubmitObject.body
+                }
 
-                    $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
-                        var tweetObject = response.data;
-                        tweetObject.CreatedTime = "Just now";
-                        tweetObject.ScheduledStatusTime = date.toLocaleString();
+                clientApplication.acquireTokenSilent([clientId])
+                    .then(function (token) {
+                        var config = {
+                            headers: {
+                                'Content-type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            }
+                        };
 
+                        var tweetObject = {
+                            "CreatedTime": "Just now",
+                            "ScheduledStatusTime": date.toLocaleString(),
+                            "TwitterHandle": $scope.tweetSubmitObject.handle,
+                            "StatusBody": $scope.tweetSubmitObject.body,
+                            "IsApprovedByHandle": false,
+                            "IsPostedByWebJob": false
+                        };
                         $scope.tweetQueue.unshift(tweetObject);
                         $scope.tweetSubmitObject = {};
                         $scope.apply;
-                    });
-                }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
 
+                        $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
+                        });
                     }, function (error) {
+                        clientApplication.acquireTokenPopup([clientId]).then(function (token) {
 
+                        }, function (error) {
+
+                        });
                     });
-                });
-
+            }
         };
 
         $scope.cancelTweet = function (tweetId, index) {
