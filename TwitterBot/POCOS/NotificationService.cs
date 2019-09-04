@@ -23,6 +23,8 @@ namespace TwitterBot.POCOS
                 " requested by user " + 
                 tweetQueue.TweetUser + ". " + "Requested tweet body: " + "<br /> <br />" +
                 "<em>" + tweetQueue.StatusBody + "</em>" + "<br /> <br />" +
+                "Scheduled for: " + tweetQueue.ScheduledStatusTime + " UTC" +
+                "<br /> <br />" +
                 "Sign in to your account to approve. <br /> " +
                 "https://aka.ms/tweet";
 
