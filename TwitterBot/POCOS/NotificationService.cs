@@ -21,10 +21,10 @@ namespace TwitterBot.POCOS
             string body = "A tweet has been routed to your Twitter handle " +
                 "<strong>" + tweetQueue.TwitterHandle + "</strong>" +
                 " requested by user " + 
-                tweetQueue.TweetUser + ". " +
+                tweetQueue.TweetUser + ". " + "Requested tweet body: " + "<br /> <br />" +
+                "<em>" + tweetQueue.StatusBody + "</em>" + "<br /> <br />" +
                 "Sign in to your account to approve. <br /> " +
-                "<br /> " +
-                "https://mstwitterbot.azurewebsites.net/";
+                "https://aka.ms/tweet";
 
             message.Body = body;
             client.Send(message);
@@ -50,7 +50,7 @@ namespace TwitterBot.POCOS
                 "<br />" +
                 "Scheduled for: " + tweetQueue.ScheduledStatusTime + " UTC" +
                 "<br /> " +
-                "https://mstwitterbot.azurewebsites.net/";
+                "https://aka.ms/tweet";
 
             message.Body = body;
             client.Send(message);
@@ -76,7 +76,7 @@ namespace TwitterBot.POCOS
                 "<br />" +
                 "Scheduled for: " + tweetQueue.ScheduledStatusTime + " UTC" +
                 "<br /> " +
-                "https://mstwitterbot.azurewebsites.net/";
+                "https://aka.ms/tweet";
 
             message.Body = body;
             client.Send(message);
