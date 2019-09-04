@@ -461,8 +461,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         }
                     };
 
+                    $scope.tweetQueue[index].IsApprovedByHandle = true;
+
                     $http.get("api/approve-or-cancel?approveById=" + tweetId + "&cancelById=0", config).then(function (response) {
-                        $scope.tweetQueue[index].IsApprovedByHandle = true;
+                        
                     });
                 }, function (error) {
                     clientApplication.acquireTokenPopup([clientId]).then(function (token) {
@@ -483,8 +485,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         }
                     };
 
+                    $scope.tweetQueue[index].IsApprovedByHandle = false;
+
                     $http.get("api/approve-or-cancel?cancelById=" + tweetId + "&approveById=0", config).then(function (response) {
-                        $scope.tweetQueue[index].IsApprovedByHandle = false;
+                        
                     });
                 }, function (error) {
                     clientApplication.acquireTokenPopup([clientId]).then(function (token) {

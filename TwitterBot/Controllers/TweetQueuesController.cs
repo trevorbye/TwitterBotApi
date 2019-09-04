@@ -75,10 +75,12 @@ namespace TwitterBot.Controllers
             if (operationType == "approve")
             {
                 tweetQueue.IsApprovedByHandle = true;
+                NotificationService.SendApprovalNotif(tweetQueue);
             }
             else
             {
                 tweetQueue.IsApprovedByHandle = false;
+                NotificationService.SendCancelNotif(tweetQueue);
             }
 
             db.SaveChanges();
