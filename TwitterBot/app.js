@@ -260,6 +260,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         $scope.apply;
 
                         $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
+                            $scope.tweetQueue[0].TweetUser = response.data.TweetUser;
+                            $scope.tweetQueue[0].Id = response.data.Id;
                         });
                     }, function (error) {
                         clientApplication.acquireTokenPopup([clientId]).then(function (token) {
