@@ -14,13 +14,17 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
     twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
         var routeResolve = {
-            "auth": function ($rootScope, $window, $q) {
+            "auth": function ($window, $q) {
                 var defer = $q.defer();
-                if ($rootScope.loggedIn == false) {
-                    $window.location.href = "https://mstwitterbot.azurewebsites.net/";
-                }
-                defer.resolve();
-                return defer.promise;
+
+                clientApplication.acquireTokenSilent([clientId])
+                    .then(function (token) {
+                        defer.resolve();
+                        return defer.promise;
+                    }, function (error) {
+                        //$window.location.href = "http://localhost:52937/";
+                        $window.location.href = "https://mstwitterbot.azurewebsites.net/";
+                    });  
             }
         };
 
@@ -58,12 +62,11 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     twitterBot.controller("login", function ($rootScope, $http, $location, $scope) {
 
         //on site load check if active token already exists in cache, then set ui auth state
-        var cachedUser = clientApplication.getUser();
-        if (cachedUser != null) {
-            $location.path("/home");
-            $scope.$apply();
-            $rootScope.$apply();
-        }
+        clientApplication.acquireTokenSilent([clientId])
+            .then(function (token) {
+                $location.path("/home");
+            }, function (error) {
+            });
 
         $scope.login = function () {
             clientApplication.loginPopup().then(function (token) {
@@ -208,26 +211,25 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             } else if ($scope.tweetSubmitObject.body == null) {
                 $scope.error = true;
                 $scope.errorMessage = "Tweet body cannot be empty.";
-            } else if ($scope.tweetSubmitObject.date == null) {
-                $scope.error = true;
-                $scope.errorMessage = "Date cannot be empty.";
-            } else if ($scope.tweetSubmitObject.time == null) {
-                $scope.error = true;
-                $scope.errorMessage = "Time cannot be empty.";
-            }
+            } 
 
             if ($scope.tweetSubmitObject.body.length > 280) {
                 $scope.error = true;
                 $scope.errorMessage = "Tweet body exceeds 280 character limit.";
             }
 
-            var date = new Date($scope.tweetSubmitObject.date);
-            var time = new Date($scope.tweetSubmitObject.time);
-            date.setHours(time.getHours(), time.getMinutes());
+            var date;
+            if ($scope.tweetSubmitObject.date == null || $scope.tweetSubmitObject.time == null) {
+                date = new Date(Date.now());
+            } else {
+                date = new Date($scope.tweetSubmitObject.date);
+                var time = new Date($scope.tweetSubmitObject.time);
+                date.setHours(time.getHours(), time.getMinutes());
 
-            if (date < Date.now()) {
-                $scope.error = true;
-                $scope.errorMessage = "Scheduled Tweet time must be in the future.";
+                if (date < Date.now()) {
+                    $scope.error = true;
+                    $scope.errorMessage = "Scheduled Tweet time must be in the future.";
+                }
             }
 
             if ($scope.error == false) {
