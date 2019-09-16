@@ -45,6 +45,27 @@ namespace TwitterBot.Controllers
             return Ok(distinctHandles);
         }
 
+        [Route("api/edit-tweet-body")]
+        [System.Web.Http.HttpPost]
+        public IHttpActionResult EditTweetByHandleOwner(TweetQueue model)
+        {
+            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
+            string user = Utilities.UsernameFromClaims(claims);
+
+            TweetQueue tweetQueue = db.TweetQueues.Find(model.Id);
+            string originalStatus = tweetQueue.StatusBody;
+            if (tweetQueue.HandleUser != user)
+            {
+                return BadRequest();
+            }
+
+            tweetQueue.StatusBody = model.StatusBody;
+            db.SaveChanges();
+            NotificationService.SendEditNotif(tweetQueue, originalStatus);
+        
+            return Ok();
+        }
+
         [Route("api/approve-or-cancel")]
         [System.Web.Http.HttpGet]
         public IHttpActionResult ApproveOrCancelTweet(int approveById, int cancelById)

@@ -360,6 +360,8 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                             var statusTimeUtc = tweet.ScheduledStatusTime + "Z";
                             tweet.ScheduledStatusTime = new Date(statusTimeUtc).toLocaleString();
+                            tweet.EditPaneExpanded = false;
+                            tweet.error = false;
                         }
 
                         $scope.tweetQueue = tweets;
@@ -451,6 +453,34 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
                     });
                 });
+        };
+
+        $scope.editTweet = function (tweet, index) {
+
+            if (tweet.StatusBody.length > 280) {
+                $scope.tweetQueue[index].error = true;
+            } else {
+                $scope.tweetQueue[index].EditPaneExpanded = false;
+
+                clientApplication.acquireTokenSilent([clientId])
+                    .then(function (token) {
+                        var config = {
+                            headers: {
+                                'Content-type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            }
+                        };
+
+                        $http.post("api/edit-tweet-body", tweet, config).then(function (response) {
+                        });
+                    }, function (error) {
+                        clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+
+                        }, function (error) {
+
+                        });
+                    });
+            }
         };
 
         $scope.approveTweet = function (tweetId, index) {

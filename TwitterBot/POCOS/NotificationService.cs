@@ -83,5 +83,32 @@ namespace TwitterBot.POCOS
             message.Body = body;
             client.Send(message);
         }
+
+        public static void SendEditNotif(TweetQueue tweetQueue, string originalStatus) {
+            SmtpClient client = new SmtpClient("smtp.office365.com", 587);
+            client.Credentials = new NetworkCredential("tweet@microsoft.com", "5tyJ)7jx3220!pWn6");
+            client.EnableSsl = true;
+
+            MailMessage message = new MailMessage();
+            message.From = new MailAddress("tweet@microsoft.com");
+            message.IsBodyHtml = true;
+            message.To.Add(tweetQueue.TweetUser);
+            message.Subject = "MS Twitter Bot Notification";
+
+            string body = "The handle owner of account " +
+                "<strong>" + tweetQueue.TwitterHandle + "</strong>" +
+                " has <strong>edited</strong> your tweet. <br />" +
+                "<br />" + "Updated status: " + "<br />" + "<br />" +
+                "<em>" + tweetQueue.StatusBody + "</em>" + "<br /> " +
+                "<br />" + "<br />" +
+                "Original status: " + "<br />" + "<br />" +
+                "<em>" + originalStatus + "</em>" + "<br /> " + "<br />" +
+                "Scheduled for: " + tweetQueue.ScheduledStatusTime + " UTC" +
+                "<br /> " +
+                "https://aka.ms/tweet";
+
+            message.Body = body;
+            client.Send(message);
+        }
     }
 }
