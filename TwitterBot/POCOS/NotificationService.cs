@@ -1,15 +1,18 @@
 ﻿using TwitterBot.Models;
 using System.Net.Mail;
 using System.Net;
+using System;
 
 namespace TwitterBot.POCOS
 {
     public class NotificationService
     {
+        private static string _pass = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+
         public static void SendNotificationToHandle(TweetQueue tweetQueue)
         {
             SmtpClient client = new SmtpClient("smtp.office365.com", 587);
-            client.Credentials = new NetworkCredential("tweet@microsoft.com", "5tyJ)7jx3220!pWn6");
+            client.Credentials = new NetworkCredential("tweet@microsoft.com", _pass);
             client.EnableSsl = true;
 
             MailMessage message = new MailMessage();
@@ -35,7 +38,7 @@ namespace TwitterBot.POCOS
         public static void SendApprovalNotif(TweetQueue tweetQueue)
         {
             SmtpClient client = new SmtpClient("smtp.office365.com", 587);
-            client.Credentials = new NetworkCredential("tweet@microsoft.com", "5tyJ)7jx3220!pWn6");
+            client.Credentials = new NetworkCredential("tweet@microsoft.com", _pass);
             client.EnableSsl = true;
 
             MailMessage message = new MailMessage();
@@ -61,7 +64,7 @@ namespace TwitterBot.POCOS
         public static void SendCancelNotif(TweetQueue tweetQueue)
         {
             SmtpClient client = new SmtpClient("smtp.office365.com", 587);
-            client.Credentials = new NetworkCredential("tweet@microsoft.com", "5tyJ)7jx3220!pWn6");
+            client.Credentials = new NetworkCredential("tweet@microsoft.com", _pass);
             client.EnableSsl = true;
 
             MailMessage message = new MailMessage();
@@ -86,7 +89,7 @@ namespace TwitterBot.POCOS
 
         public static void SendEditNotif(TweetQueue tweetQueue, string originalStatus) {
             SmtpClient client = new SmtpClient("smtp.office365.com", 587);
-            client.Credentials = new NetworkCredential("tweet@microsoft.com", "5tyJ)7jx3220!pWn6");
+            client.Credentials = new NetworkCredential("tweet@microsoft.com", _pass);
             client.EnableSsl = true;
 
             MailMessage message = new MailMessage();

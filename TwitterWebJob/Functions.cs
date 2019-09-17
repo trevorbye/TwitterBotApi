@@ -14,7 +14,8 @@ namespace TwitterWebJob
         public static void ProcessTweets(TextWriter log)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-            string bearer = "Bearer 893871c2-65cf-4677-a846-435fe9e5f321";
+            string token = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
+            string bearer = "Bearer " + token;
             HttpClient client = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage
             {
