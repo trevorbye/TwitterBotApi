@@ -161,7 +161,6 @@
     <Compile Include="Models\TweetQueueAccountReturnEntity.cs" />
     <Compile Include="Models\TwitterAccount.cs" />
     <Compile Include="Models\TwitterBotContext.cs" />
-    <Compile Include="POCOS\DeployConfig.cs" />
     <Compile Include="POCOS\NotificationService.cs" />
     <Compile Include="POCOS\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
