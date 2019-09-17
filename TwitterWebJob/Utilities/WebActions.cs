@@ -10,6 +10,9 @@ namespace TwitterWebJob
 {
     class WebActions
     {
+        private static string _consumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
+        private static string _secret = Environment.GetEnvironmentVariable("SECRET");
+
         private static string ShaHash(string value, string signingKey)
         {
             using (var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)))
@@ -24,7 +27,7 @@ namespace TwitterWebJob
             // find correct account in dict
             WebJobTwitterAccount webJobTwitterAccount = accountsDict[tweetQueue.HandleUser];
 
-            string oauthConsumerKey = WebUtility.UrlEncode("Z56vS7LzR2KlEN44FCGDz6g3g");
+            string oauthConsumerKey = WebUtility.UrlEncode(_consumerKey);
             string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
             string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
             string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
@@ -48,7 +51,7 @@ namespace TwitterWebJob
 
             string signatureBaseString = "POST&" + WebUtility.UrlEncode(baseUrl) + "&"
                 + WebUtility.UrlEncode(paramString);
-            string signingKey = "7WXse93IFMia1Lj3VvGh83L1wCFfJqQM4Cj9mkkZClqHNSfs5M" + "&" + oauthSecret;
+            string signingKey = _secret + "&" + oauthSecret;
             string oauthSignature = ShaHash(signatureBaseString, signingKey);
 
             string authString = "OAuth " +
