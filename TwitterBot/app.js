@@ -44,6 +44,10 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             templateUrl: 'templates/manage.html',
             controller: 'manage',
             resolve: routeResolve
+        }).when('/development', {
+            templateUrl: 'templates/dev.html',
+            controller: 'dev',
+            resolve: routeResolve
         }).when('/add-account-redirect', {
             templateUrl: 'templates/twitter-redirect.html',
             controller: 'redirect',
@@ -90,6 +94,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $rootScope.manageText = "Manage";
         $rootScope.tweetText = "Tweet";
         $rootScope.logoutText = "Logout";
+        $rootScope.devText = "Development";
 
         // db init request 
         $http.get("api/init-loader").then(function (response) {
@@ -117,11 +122,16 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.tweet = function () {
             $location.path("/tweet-portal");
         };
+
+        $scope.dev = function () {
+            $location.path("/development");
+        };
     });
 
     twitterBot.controller("home", function ($rootScope, $http, $location, $scope) {
         $rootScope.tweetActive = false;
         $rootScope.manageActive = false;
+        $rootScope.devActive = false;
 
         $scope.manage = function () {
             $location.path("/management-portal");
@@ -132,10 +142,17 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         }
     });
 
+    twitterBot.controller("dev", function ($rootScope, $http, $location, $scope) {
+        $rootScope.tweetActive = false;
+        $rootScope.manageActive = false;
+        $rootScope.devActive = true;
+    });
+
     twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope, $routeParams) {
         // set navbar active classes
         $rootScope.tweetActive = true;
         $rootScope.manageActive = false;
+        $rootScope.devActive = false;
 
         $scope.tweetQueue = [];
         $scope.handles = [];
@@ -305,6 +322,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     twitterBot.controller("manage", function ($http, $location, $scope, $window, $rootScope) {
         $rootScope.tweetActive = false;
         $rootScope.manageActive = true;
+        $rootScope.devActive = false;
 
         $scope.handles = [];
         $scope.tweetQueue = [];

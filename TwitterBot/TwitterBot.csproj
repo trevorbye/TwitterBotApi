@@ -131,6 +131,7 @@
     <Content Include="index.html" />
     <Content Include="Global.asax" />
     <Content Include="templates\404.html" />
+    <Content Include="templates\dev.html" />
     <Content Include="templates\home.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\manage.html" />
