@@ -1,12 +1,6 @@
-﻿var clientId = "f3031107-74e2-4be0-ae9a-e015c90c42c2";
-function authCallback(errorDesc, token, error, tokenType) {
-    if (token) {
-    }
-    else {
-        log(error + ":" + errorDesc);
-    }
-}
-var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallback);
+﻿var clientIdString = "f3031107-74e2-4be0-ae9a-e015c90c42c2";
+var authority = "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47"
+var clientApplication = new Msal.UserAgentApplication(clientIdString, authority);
 
 (function () {
 
@@ -17,7 +11,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             "auth": function ($window, $q) {
                 var defer = $q.defer();
 
-                clientApplication.acquireTokenSilent([clientId])
+                clientApplication.acquireTokenSilent([clientIdString])
                     .then(function (token) {
                         defer.resolve();
                         return defer.promise;
@@ -66,7 +60,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
     twitterBot.controller("login", function ($rootScope, $http, $location, $scope) {
 
         //on site load check if active token already exists in cache, then set ui auth state
-        clientApplication.acquireTokenSilent([clientId])
+        clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
                 $location.path("/home");
             }, function (error) {
@@ -160,7 +154,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.error = false;
         $scope.errorMessage = "";
 
-        clientApplication.acquireTokenSilent([clientId])
+        clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
                 var config = {
                     headers: {
@@ -211,7 +205,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 });
 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                 }, function (error) {
 
@@ -257,7 +251,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     "StatusBody": $scope.tweetSubmitObject.body
                 }
 
-                clientApplication.acquireTokenSilent([clientId])
+                clientApplication.acquireTokenSilent([clientIdString])
                     .then(function (token) {
                         var config = {
                             headers: {
@@ -283,7 +277,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                             $scope.tweetQueue[0].Id = response.data.Id;
                         });
                     }, function (error) {
-                        clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                        clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                         }, function (error) {
 
@@ -294,7 +288,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
 
         $scope.cancelTweet = function (tweetId, index) {
 
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -309,7 +303,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                     });
 
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -327,7 +321,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.handles = [];
         $scope.tweetQueue = [];
 
-        clientApplication.acquireTokenSilent([clientId])
+        clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
                 var config = {
                     headers: {
@@ -388,7 +382,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 });
                 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                 }, function (error) {
 
@@ -406,7 +400,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.enableAutoTweets = function (handle, index) {
             $scope.handles[index].retweet = true;
 
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -419,7 +413,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         
                     });
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -430,7 +424,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         $scope.disableAutoTweets = function (handle, index) {
             $scope.handles[index].retweet = false;
 
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -443,7 +437,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         
                     });
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -452,7 +446,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         };
 
         $scope.deleteAccount = function (handle, index) {
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -465,7 +459,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         $scope.handles.splice(index, 1);
                     });
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -480,7 +474,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             } else {
                 $scope.tweetQueue[index].EditPaneExpanded = false;
 
-                clientApplication.acquireTokenSilent([clientId])
+                clientApplication.acquireTokenSilent([clientIdString])
                     .then(function (token) {
                         var config = {
                             headers: {
@@ -492,7 +486,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         $http.post("api/edit-tweet-body", tweet, config).then(function (response) {
                         });
                     }, function (error) {
-                        clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                        clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                         }, function (error) {
 
@@ -502,7 +496,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         };
 
         $scope.approveTweet = function (tweetId, index) {
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -517,7 +511,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         
                     });
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -526,7 +520,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         };
 
         $scope.cancelTweet = function (tweetId, index) {
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -541,7 +535,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         
                     });
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -550,7 +544,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
         };
 
         $scope.twitterSignIn = function () {
-            clientApplication.acquireTokenSilent([clientId])
+            clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
                     var config = {
                         headers: {
@@ -563,7 +557,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                         $window.location.href = "https://api.twitter.com/oauth/authenticate?oauth_token=" + response.data;
                     });
                 }, function (error) {
-                    clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                     }, function (error) {
 
@@ -589,7 +583,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
             verifier: oauthVerifier
         };
 
-        clientApplication.acquireTokenSilent([clientId])
+        clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
                 var config = {
                     headers: {
@@ -612,7 +606,7 @@ var clientApplication = new Msal.UserAgentApplication(clientId, null, authCallba
                 });
                 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientId]).then(function (token) {
+                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
                 }, function (error) {
 
