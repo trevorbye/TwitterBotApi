@@ -6,7 +6,7 @@ namespace TwitterBot.Migrations
     using System.Linq;
     using TwitterBot.Models;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<TwitterBot.Models.TwitterBotContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<TwitterBotContext>
     {
         
         public Configuration()
@@ -14,7 +14,7 @@ namespace TwitterBot.Migrations
             AutomaticMigrationsEnabled = true;
         }
         
-        protected override void Seed(TwitterBot.Models.TwitterBotContext context)
+        protected override void Seed(TwitterBotContext context)
         {
             
         }

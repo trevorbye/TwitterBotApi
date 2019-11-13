@@ -19,11 +19,11 @@ namespace TwitterBot.Models
         {
         }
 
-        public System.Data.Entity.DbSet<TwitterBot.Models.AdminManager> AdminManagers { get; set; }
+        public DbSet<AdminManager> AdminManagers { get; set; }
 
-        public System.Data.Entity.DbSet<TwitterBot.Models.TweetQueue> TweetQueues { get; set; }
+        public DbSet<TweetQueue> TweetQueues { get; set; }
 
-        public System.Data.Entity.DbSet<TwitterBot.Models.TwitterAccount> TwitterAccounts { get; set; }
+        public DbSet<TwitterAccount> TwitterAccounts { get; set; }
 
     }
 }

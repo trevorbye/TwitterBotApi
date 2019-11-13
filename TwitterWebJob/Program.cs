@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Microsoft.Azure.WebJobs;
 
 namespace TwitterWebJob
@@ -14,9 +13,13 @@ namespace TwitterWebJob
                 config.UseDevelopmentSettings();
             }
 
-            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
-            var host = new JobHost(config);
-            host.Call(typeof(Functions).GetMethod("ProcessTweets"));
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+
+            using (var host = new JobHost(config))
+            {
+                host.Call(typeof(Functions).GetMethod("ProcessTweets"));
+            }
         }
     }
 }

@@ -1,45 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using System.Net.Http;
 using System.Net;
+using System.Linq;
 
 namespace TwitterWebJob
 {
     public class Functions
     {
+        static readonly string Token = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
+
         [NoAutomaticTrigger]
-        public static void ProcessTweets(TextWriter log)
+        public static async Task ProcessTweets(TextWriter log)
         {
-            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-            string token = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
-            string bearer = "Bearer " + token;
-            HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage
+            var bearer = $"Bearer {Token}";
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
             {
                 RequestUri = new Uri("https://mstwitterbot.azurewebsites.net/api/webjob-fetch-queue"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
-                    {HttpRequestHeader.Authorization.ToString(), bearer}
+                    { HttpRequestHeader.Authorization.ToString(), bearer }
                 }
             };
 
-            var response = client.SendAsync(request).Result;
-            WebJobTweetQueueAccountReturnEntity content = response.Content
-                .ReadAsAsync<WebJobTweetQueueAccountReturnEntity>().Result;
+            var response = await client.SendAsync(request);
+            var content =
+                await response.Content
+                              .ReadAsAsync<WebJobTweetQueueAccountReturnEntity>();
 
-            IDictionary<string, WebJobTwitterAccount> accountsDict = content.Accounts;
-            List<Task> asyncCalls = new List<Task>();
-           
-            foreach (WebJobTweetQueue tweetQueue in content.Tweets)
-            {
-                asyncCalls.Add(WebActions.SendTweet(tweetQueue, accountsDict, bearer));
-            }
-
-            Task.WaitAll(asyncCalls.ToArray());
+            var accountsDict = content.Accounts;
+            await Task.WhenAll(
+                content.Tweets
+                       .Select(
+                    tweetQueue => 
+                        WebActions.SendTweetAsync(tweetQueue, accountsDict, bearer)));
         }
     }
 }

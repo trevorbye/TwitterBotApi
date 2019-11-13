@@ -7,40 +7,16 @@ namespace TwitterBot.POCOS
 {
     public static class Utilities
     {
-        public static bool IsAdmin(IEnumerable<Claim> claims, TwitterBotContext db)
+        public static bool IsAdmin(IEnumerable<Claim> claims, TwitterBotContext databaseContext)
         {
-            string preferredUsername = "";
-            foreach (Claim claim in claims)
-            {
-                if (claim.Type == "preferred_username")
-                {
-                    preferredUsername = claim.Value;
-                    break;
-                }
-            }
-            var admin = db.AdminManagers
-                                .Where(admins => admins.User == preferredUsername)
-                                .FirstOrDefault();
-            if (admin == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            var preferredUsername = UsernameFromClaims(claims);
+            return databaseContext.AdminManagers
+                                  .FirstOrDefault(
+                admins => admins.User == preferredUsername) != null;
         }
 
-        public static string UsernameFromClaims(IEnumerable<Claim> claims)
-        {
-            foreach (Claim claim in claims)
-            {
-                if (claim.Type == "preferred_username")
-                {
-                    return claim.Value;
-                }
-            }
-            return "";
-        }
+        public static string UsernameFromClaims(IEnumerable<Claim> claims) =>
+            claims.FirstOrDefault(claim => claim.Type == "preferred_username")
+                  ?.Value ?? "";
     }
 }
