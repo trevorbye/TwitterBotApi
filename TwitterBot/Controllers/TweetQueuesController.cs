@@ -7,74 +7,68 @@ using TwitterBot.Models;
 using TwitterBot.POCOS;
 using System.Security.Claims;
 
-
 namespace TwitterBot.Controllers
 {
     [Authorize]
     public class TweetQueuesController : ApiController
     {
-        private TwitterBotContext db = new TwitterBotContext();
+        readonly TwitterBotContext _databaseContext = new TwitterBotContext();
 
-        [Route("api/get-user-tweet-queue")]
-        [System.Web.Http.HttpGet]
+        [HttpGet, Route("api/get-user-tweet-queue")]
         public IHttpActionResult GetUserTweetQueue()
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string user = Utilities.UsernameFromClaims(claims);
-            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.TweetUser == user)
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
+            IList<TweetQueue> tweets = _databaseContext.TweetQueues.Where(table => table.TweetUser == user)
                 .OrderByDescending(x => x.CreatedTime).ToList();
             return Ok(tweets);
         }
 
-        [Route("api/get-handles-tweet-queue")]
-        [System.Web.Http.HttpGet]
+        [HttpGet, Route("api/get-handles-tweet-queue")]
         public IHttpActionResult GetHandlesTweetQueue()
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string user = Utilities.UsernameFromClaims(claims);
-            IList<TweetQueue> tweets = db.TweetQueues.Where(table => table.HandleUser == user)
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
+            IList<TweetQueue> tweets = _databaseContext.TweetQueues.Where(table => table.HandleUser == user)
                 .OrderByDescending(x => x.CreatedTime).ToList();
             return Ok(tweets);
         }
 
-        [Route("api/get-distinct-handles")]
-        [System.Web.Http.HttpGet]
-        public IHttpActionResult GetDistinctHandles()
-        {
-            IList<string> distinctHandles = db.TwitterAccounts.Select(table => table.TwitterHandle).Distinct().ToList();
-            return Ok(distinctHandles);
-        }
+        [HttpGet, Route("api/get-distinct-handles")]
+        public IHttpActionResult GetDistinctHandles() => 
+            Ok(_databaseContext.TwitterAccounts
+                               .Select(table => table.TwitterHandle)
+                               .Distinct()
+                               .ToList());
 
-        [Route("api/edit-tweet-body")]
-        [System.Web.Http.HttpPost]
+        [HttpPost, Route("api/edit-tweet-body")]
         public IHttpActionResult EditTweetByHandleOwner(TweetQueue model)
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string user = Utilities.UsernameFromClaims(claims);
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
 
-            TweetQueue tweetQueue = db.TweetQueues.Find(model.Id);
-            string originalStatus = tweetQueue.StatusBody;
+            var tweetQueue = _databaseContext.TweetQueues.Find(model.Id);
+            var originalStatus = tweetQueue.StatusBody;
             if (tweetQueue.HandleUser != user)
             {
                 return BadRequest();
             }
 
             tweetQueue.StatusBody = model.StatusBody;
-            db.SaveChanges();
+            _databaseContext.SaveChanges();
             NotificationService.SendEditNotif(tweetQueue, originalStatus);
         
             return Ok();
         }
 
-        [Route("api/approve-or-cancel")]
-        [System.Web.Http.HttpGet]
+        [HttpGet, Route("api/approve-or-cancel")]
         public IHttpActionResult ApproveOrCancelTweet(int approveById, int cancelById)
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string user = Utilities.UsernameFromClaims(claims);
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
 
-            int tweetIdCheck = 0;
-            string operationType = "";
+            var tweetIdCheck = 0;
+            var operationType = "";
 
             if (cancelById == 0)
             {
@@ -87,7 +81,7 @@ namespace TwitterBot.Controllers
                 operationType = "cancel";
             }
 
-            TweetQueue tweetQueue = db.TweetQueues.Find(tweetIdCheck);
+            var tweetQueue = _databaseContext.TweetQueues.Find(tweetIdCheck);
             if (tweetQueue.HandleUser != user)
             {
                 return BadRequest();
@@ -104,23 +98,22 @@ namespace TwitterBot.Controllers
                 NotificationService.SendCancelNotif(tweetQueue);
             }
 
-            db.SaveChanges();
+            _databaseContext.SaveChanges();
             return Ok();
         }
 
-        [Route("api/delete-tweet")]
-        [System.Web.Http.HttpDelete]
+        [HttpDelete, Route("api/delete-tweet")]
         public IHttpActionResult DeleteTweet(int id)
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string user = Utilities.UsernameFromClaims(claims);
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
 
             // find tweet by id, make sure claims user == tweet user
-            TweetQueue tweetQueue = db.TweetQueues.Find(id);
+            var tweetQueue = _databaseContext.TweetQueues.Find(id);
             if (tweetQueue.TweetUser == user)
             {
-                db.TweetQueues.Remove(tweetQueue);
-                db.SaveChanges();
+                _databaseContext.TweetQueues.Remove(tweetQueue);
+                _databaseContext.SaveChanges();
                 return Ok();
             }
             else
@@ -129,17 +122,16 @@ namespace TwitterBot.Controllers
             }
         }
 
-        [Route("api/post-new-tweet")]
-        [System.Web.Http.HttpPost]
+        [HttpPost, Route("api/post-new-tweet")]
         public IHttpActionResult PostNewTweet(TweetQueue tweetQueue)
         {
             //get user from auth claim
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string user = Utilities.UsernameFromClaims(claims);
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
             tweetQueue.TweetUser = user;
 
             // find twitter account user
-            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == tweetQueue.TwitterHandle).FirstOrDefault();
+            var account = _databaseContext.TwitterAccounts.Where(table => table.TwitterHandle == tweetQueue.TwitterHandle).FirstOrDefault();
             tweetQueue.HandleUser = account.HandleUser;
 
             // populate last few object fields
@@ -147,8 +139,8 @@ namespace TwitterBot.Controllers
             tweetQueue.IsApprovedByHandle = false;
             tweetQueue.IsPostedByWebJob = false;
 
-            db.TweetQueues.Add(tweetQueue);
-            db.SaveChanges();
+            _databaseContext.TweetQueues.Add(tweetQueue);
+            _databaseContext.SaveChanges();
 
             NotificationService.SendNotificationToHandle(tweetQueue);
             tweetQueue.HandleUser = null;

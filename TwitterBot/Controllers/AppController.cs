@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using TwitterBot.Models;
 using TwitterBot.POCOS;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web;
-using System.Security.Claims;
 
 namespace TwitterBot.Controllers
 {
     [Authorize]
     public class AppController : ApiController
     {
-        private TwitterBotContext db = new TwitterBotContext();
-        private string _consumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
-        private string _secret = Environment.GetEnvironmentVariable("SECRET");
-        private string _callback = "https://mstwitterbot.azurewebsites.net/add-account-redirect";
+        private readonly TwitterBotContext _databaseContext = new TwitterBotContext();
+        static readonly string ConsumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
+        static readonly string Secret = Environment.GetEnvironmentVariable("SECRET");
+        const string Callback = "https://mstwitterbot.azurewebsites.net/add-account-redirect";
 
-        private string ShaHash(string value, string signingKey)
+        string ShaHash(string value, string signingKey)
         {
             using (var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)))
             {
@@ -29,30 +30,29 @@ namespace TwitterBot.Controllers
             }
         }
 
-        [Route("api/twitter-auth-token")]
-        [System.Web.Http.HttpGet]
-        public IHttpActionResult GetTwitterOauthString()
+        [HttpGet, Route("api/twitter-auth-token")]
+        public async Task<IHttpActionResult> GetTwitterOauthString()
         {
-            string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/request_token");
-            string oauthCallback = WebUtility.UrlEncode(_callback);
-            string oauthConsumerKey = WebUtility.UrlEncode(_consumerKey);
-            string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
-            string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
-            string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            string version = WebUtility.UrlEncode("1.0");
+            var baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/request_token");
+            var oauthCallback = WebUtility.UrlEncode(Callback);
+            var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
+            var oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
+            var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            var version = WebUtility.UrlEncode("1.0");
 
-            string paramString = "oauth_callback=" + oauthCallback + "&" +
+            var paramString = "oauth_callback=" + oauthCallback + "&" +
                 "oauth_consumer_key=" + oauthConsumerKey + "&" +
                 "oauth_nonce=" + oauthNonce + "&" +
                 "oauth_signature_method=" + sigMethod + "&" +
                 "oauth_timestamp=" + timestamp + "&" +
                 "oauth_version=" + version;
 
-            string signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
-            string signingKey = _secret + "&";
-            string oauthSignature = ShaHash(signatureBaseString, signingKey);
+            var signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
+            var signingKey = Secret + "&";
+            var oauthSignature = ShaHash(signatureBaseString, signingKey);
 
-            string authString = "OAuth " +
+            var authString = "OAuth " +
                 "oauth_callback=" + "\"" + oauthCallback + "\"" + ", " +
                 "oauth_consumer_key=" + "\"" + oauthConsumerKey + "\"" + ", " +
                 "oauth_nonce=" + "\"" + oauthNonce + "\"" + ", " +
@@ -61,40 +61,42 @@ namespace TwitterBot.Controllers
                 "oauth_timestamp=" + "\"" + timestamp + "\"" + ", " +
                 "oauth_version=" + "\"" + version + "\"";
 
-            HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
             {
                 RequestUri = new Uri("https://api.twitter.com/oauth/request_token"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
-                    {HttpRequestHeader.Authorization.ToString(), authString}
+                    { HttpRequestHeader.Authorization.ToString(), authString }
                 }
             };
-            var response = client.SendAsync(request).Result;
-            var content = response.Content.ReadAsStringAsync().Result;
+
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
             var parsed = HttpUtility.ParseQueryString(content);
-            string authToken = parsed["oauth_token"];
+            var authToken = parsed["oauth_token"];
+
             return Ok(authToken);
         }
 
-        [Route("api/convert-to-access-token")]
-        [System.Web.Http.HttpGet]
-        public IHttpActionResult GetTwitterAccessToken(string token, string verifier)
+        [HttpGet, Route("api/convert-to-access-token")]
+        public async Task<IHttpActionResult> GetTwitterAccessToken(string token, string verifier)
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string principle = Utilities.UsernameFromClaims(claims);
+            var claims = ClaimsPrincipal.Current.Claims;
+            var principle = Utilities.UsernameFromClaims(claims);
 
-            string baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
-            string oauthConsumerKey = WebUtility.UrlEncode(_consumerKey);
-            string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
-            string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
-            string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            string version = WebUtility.UrlEncode("1.0");
-            string oauthToken = WebUtility.UrlEncode(token);
-            string oauthVerifier = WebUtility.UrlEncode(verifier);
+            var baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
+            var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
+            var oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
+            var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            var version = WebUtility.UrlEncode("1.0");
+            var oauthToken = WebUtility.UrlEncode(token);
+            var oauthVerifier = WebUtility.UrlEncode(verifier);
 
-            string paramString =
+            var paramString =
                 "oauth_consumer_key=" + oauthConsumerKey + "&" +
                 "oauth_nonce=" + oauthNonce + "&" +
                 "oauth_signature_method=" + sigMethod + "&" +
@@ -103,11 +105,11 @@ namespace TwitterBot.Controllers
                 "oauth_verifier=" + oauthVerifier + "&" +
                 "oauth_version=" + version;
 
-            string signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
-            string signingKey = _secret + "&" + oauthToken;
-            string oauthSignature = ShaHash(signatureBaseString, signingKey);
+            var signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
+            var signingKey = Secret + "&" + oauthToken;
+            var oauthSignature = ShaHash(signatureBaseString, signingKey);
 
-            string authString = "OAuth " +
+            var authString = "OAuth " +
                 "oauth_consumer_key=" + "\"" + oauthConsumerKey + "\"" + ", " +
                 "oauth_nonce=" + "\"" + oauthNonce + "\"" + ", " +
                 "oauth_signature=" + "\"" + WebUtility.UrlEncode(oauthSignature) + "\"" + ", " +
@@ -117,8 +119,8 @@ namespace TwitterBot.Controllers
                 "oauth_verifier=" + "\"" + oauthVerifier + "\"" + ", " +
                 "oauth_version=" + "\"" + version + "\"";
 
-            HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
             {
                 RequestUri = new Uri("https://api.twitter.com/oauth/access_token"),
                 Method = HttpMethod.Post,
@@ -127,11 +129,12 @@ namespace TwitterBot.Controllers
                     {HttpRequestHeader.Authorization.ToString(), authString}
                 }
             };
-            var response = client.SendAsync(request).Result;
-            var content = response.Content.ReadAsStringAsync().Result;
-            var parsed = HttpUtility.ParseQueryString(content);
 
-            TwitterAccount twitterAccount = new TwitterAccount
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            var parsed = HttpUtility.ParseQueryString(content);
+            var twitterAccount = new TwitterAccount
             {
                 HandleUser = principle,
                 TwitterHandle = "@" + parsed["screen_name"],
@@ -141,14 +144,17 @@ namespace TwitterBot.Controllers
                 IsAutoRetweetEnabled = false
             };
 
-            //check if account has already been added
-            IList<TwitterAccount> accounts = db.TwitterAccounts.Where(
-                table => table.TwitterHandle == twitterAccount.TwitterHandle).ToList();
+            // Check if account has already been added
+            var accounts = 
+                _databaseContext.TwitterAccounts
+                                .Where(table => table.TwitterHandle == twitterAccount.TwitterHandle)
+                                .ToList();
 
             if (accounts.Count == 0)
             {
-                db.TwitterAccounts.Add(twitterAccount);
-                db.SaveChanges();
+                _databaseContext.TwitterAccounts.Add(twitterAccount);
+                _databaseContext.SaveChanges();
+
                 return Ok(twitterAccount.TwitterHandle);
             }
             else
@@ -157,92 +163,79 @@ namespace TwitterBot.Controllers
             }
         }
 
-        [Route("api/enable-auto-tweets")]
-        [System.Web.Http.HttpGet]
-        public IHttpActionResult EnableAccountRetweetStatus(string handle) {
-
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string principle = Utilities.UsernameFromClaims(claims);
-
-            //ensure principle owns the handle
-            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == handle)
-                .FirstOrDefault();
-            if (account.HandleUser != principle)
+        [HttpGet, Route("api/enable-auto-tweets")]
+        public IHttpActionResult EnableAccountRetweetStatus(string handle)
+        {
+            var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            if (!ownsHandle)
             {
                 return BadRequest();
             }
             else
             {
                 account.IsAutoRetweetEnabled = true;
-                db.SaveChanges();
+                _databaseContext.SaveChanges();
+
                 return Ok();
             }
         }
 
-        [Route("api/disable-auto-tweets")]
-        [System.Web.Http.HttpGet]
+        [HttpGet, Route("api/disable-auto-tweets")]
         public IHttpActionResult DisableAccountRetweetStatus(string handle)
         {
-
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string principle = Utilities.UsernameFromClaims(claims);
-
-            //ensure principle owns the handle
-            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == handle)
-                .FirstOrDefault();
-            if (account.HandleUser != principle)
+            var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            if (!ownsHandle)
             {
                 return BadRequest();
             }
             else
             {
                 account.IsAutoRetweetEnabled = false;
-                db.SaveChanges();
+                _databaseContext.SaveChanges();
+
                 return Ok();
             }
         }
 
-        [Route("api/delete-twitter-account")]
-        [System.Web.Http.HttpDelete]
+        [HttpDelete, Route("api/delete-twitter-account")]
         public IHttpActionResult DeleteTwitterAccount(string handle)
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string principle = Utilities.UsernameFromClaims(claims);
-
-            //ensure principle owns the handle
-            TwitterAccount account = db.TwitterAccounts.Where(table => table.TwitterHandle == handle)
-                .FirstOrDefault();
-            if (account.HandleUser != principle)
+            var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            if (!ownsHandle)
             {
                 return BadRequest();
             }
             else
             {
-                db.TwitterAccounts.Remove(account);
-                db.SaveChanges();
+                _databaseContext.TwitterAccounts.Remove(account);
+                _databaseContext.SaveChanges();
+
                 return Ok();
             }
         }
 
-        [Route("api/get-user-twitter-accounts")]
-        [System.Web.Http.HttpGet]
+        (bool ownsHandle, TwitterAccount account) EnsurePrincipleOwnsHandle(string handle)
+        {
+            var claims = ClaimsPrincipal.Current.Claims;
+            var principle = Utilities.UsernameFromClaims(claims);
+            var account = _databaseContext.TwitterAccounts.FirstOrDefault(table => table.TwitterHandle == handle);
+
+            return (account.HandleUser == principle, account);
+        }
+
+        [HttpGet, Route("api/get-user-twitter-accounts")]
         public IHttpActionResult GetUserTwitterAccounts()
         {
-            IEnumerable<Claim> claims = ClaimsPrincipal.Current.Claims;
-            string principle = Utilities.UsernameFromClaims(claims);
+            var claims = ClaimsPrincipal.Current.Claims;
+            var principle = Utilities.UsernameFromClaims(claims);
 
-            IList<TwitterAccount> accounts = db.TwitterAccounts.Where(
-                table => table.HandleUser == principle).ToList();
-
-            IList<TwitterAccount> returnAccounts = new List<TwitterAccount>();
-            foreach (TwitterAccount account in accounts)
-            {
-                TwitterAccount returnAccount = new TwitterAccount();
-                returnAccount.TwitterHandle = account.TwitterHandle;
-                returnAccount.IsAutoRetweetEnabled = account.IsAutoRetweetEnabled;
-                returnAccounts.Add(returnAccount);
-            }
-            return Ok(returnAccounts);
+            return Ok(_databaseContext.TwitterAccounts
+                        .Where(table => table.HandleUser == principle)
+                        .Select(account => new TwitterAccount
+                        {
+                            TwitterHandle = account.TwitterHandle,
+                            IsAutoRetweetEnabled = account.IsAutoRetweetEnabled
+                        }));
         }
     }
 }

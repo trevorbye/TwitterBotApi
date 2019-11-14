@@ -5,11 +5,7 @@ namespace TwitterBot.Controllers
 {
     public class UtilController : ApiController
     {
-        [Route("api/get-utc-now")]
-        [System.Web.Http.HttpGet]
-        public IHttpActionResult GetUserTweetQueue()
-        {
-            return Ok(DateTime.UtcNow);
-        }
+        [HttpGet, Route("api/get-utc-now")]
+        public IHttpActionResult GetUserTweetQueue() => Ok(DateTime.UtcNow);
     }
 }

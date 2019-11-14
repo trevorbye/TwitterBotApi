@@ -63,7 +63,7 @@ namespace TwitterBot
             _synclock.EnterWriteLock();
             try
             {
-                OpenIdConnectConfiguration config = Task.Run(_configManager.GetConfigurationAsync).Result;
+                var config = Task.Run(_configManager.GetConfigurationAsync).Result;
                 _issuer = config.Issuer;
                 _tokens = config.SigningTokens;
             }

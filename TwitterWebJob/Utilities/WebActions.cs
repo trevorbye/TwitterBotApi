@@ -10,10 +10,10 @@ namespace TwitterWebJob
 {
     class WebActions
     {
-        private static string _consumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
-        private static string _secret = Environment.GetEnvironmentVariable("SECRET");
+        static readonly string ConsumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
+        static readonly string Secret = Environment.GetEnvironmentVariable("SECRET");
 
-        private static string ShaHash(string value, string signingKey)
+        static string ShaHash(string value, string signingKey)
         {
             using (var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)))
             {
@@ -21,26 +21,23 @@ namespace TwitterWebJob
             }
         }
 
-        public static async Task SendTweet(WebJobTweetQueue tweetQueue, IDictionary<string, WebJobTwitterAccount> accountsDict, string bearer)
+        public static async Task SendTweetAsync(
+            WebJobTweetQueue tweetQueue,
+            IDictionary<string, WebJobTwitterAccount> accountsDict,
+            string bearer)
         {
-            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-            // find correct account in dict
-            WebJobTwitterAccount webJobTwitterAccount = accountsDict[tweetQueue.HandleUser];
+            var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
+            var oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
+            var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            var version = WebUtility.UrlEncode("1.0");
+            var webJobTwitterAccount = accountsDict[tweetQueue.HandleUser];
+            var oauthToken = WebUtility.UrlEncode(webJobTwitterAccount.OauthToken);
+            var oauthSecret = WebUtility.UrlEncode(webJobTwitterAccount.OauthSecret);
+            var status = Uri.EscapeDataString(tweetQueue.StatusBody);
+            var baseUrl = "https://api.twitter.com/1.1/statuses/update.json";
 
-            string oauthConsumerKey = WebUtility.UrlEncode(_consumerKey);
-            string oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
-            string sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
-            string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            string version = WebUtility.UrlEncode("1.0");
-
-            // from account object
-            string oauthToken = WebUtility.UrlEncode(webJobTwitterAccount.OauthToken);
-            string oauthSecret = WebUtility.UrlEncode(webJobTwitterAccount.OauthSecret);
-
-            string status = Uri.EscapeDataString(tweetQueue.StatusBody);
-            string baseUrl = "https://api.twitter.com/1.1/statuses/update.json";
-
-            string paramString =
+            var paramString =
                 "oauth_consumer_key=" + oauthConsumerKey + "&" +
                 "oauth_nonce=" + oauthNonce + "&" +
                 "oauth_signature_method=" + sigMethod + "&" +
@@ -49,12 +46,12 @@ namespace TwitterWebJob
                 "oauth_version=" + version + "&" +
                 "status=" + status;
 
-            string signatureBaseString = "POST&" + WebUtility.UrlEncode(baseUrl) + "&"
-                + WebUtility.UrlEncode(paramString);
-            string signingKey = _secret + "&" + oauthSecret;
-            string oauthSignature = ShaHash(signatureBaseString, signingKey);
+            var signatureBaseString =
+                $"POST&{WebUtility.UrlEncode(baseUrl)}&{WebUtility.UrlEncode(paramString)}";
+            var signingKey = $"{Secret}&{oauthSecret}";
+            var oauthSignature = ShaHash(signatureBaseString, signingKey);
 
-            string authString = "OAuth " +
+            var authString = "OAuth " +
                 "oauth_consumer_key=" + "\"" + oauthConsumerKey + "\"" + ", " +
                 "oauth_nonce=" + "\"" + oauthNonce + "\"" + ", " +
                 "oauth_signature=" + "\"" + WebUtility.UrlEncode(oauthSignature) + "\"" + ", " +
@@ -63,36 +60,31 @@ namespace TwitterWebJob
                 "oauth_token=" + "\"" + oauthToken + "\"" + ", " +
                 "oauth_version=" + "\"" + version + "\"";
 
-            HttpClient client = new HttpClient();
-            HttpRequestMessage request = new HttpRequestMessage
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
             {
-                RequestUri = new Uri(baseUrl + "?status=" + status),
+                RequestUri = new Uri($"{baseUrl}?status={status}"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
-                    {HttpRequestHeader.Authorization.ToString(), authString}
+                    { HttpRequestHeader.Authorization.ToString(), authString }
                 }
             };
-            var response = client.SendAsync(request).Result;
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            
+            var response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
             {
-                HttpClient markTweetClient = new HttpClient();
-                HttpRequestMessage serviceRequest = new HttpRequestMessage
+                var serviceRequest = new HttpRequestMessage
                 {
-                    RequestUri = new Uri("https://mstwitterbot.azurewebsites.net/api/webjob-mark-complete?tweetQueueId=" + tweetQueue.Id.ToString()),
+                    RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/webjob-mark-complete?tweetQueueId={tweetQueue.Id}"),
                     Method = HttpMethod.Get,
                     Headers =
-                {
-                    {HttpRequestHeader.Authorization.ToString(), bearer}
-                }
+                    {
+                        { HttpRequestHeader.Authorization.ToString(), bearer }
+                    }
                 };
 
-                await markTweetClient.SendAsync(serviceRequest);
-            }
-            else
-            {
-                return;
+                await client.SendAsync(serviceRequest);
             }
         }
     }
