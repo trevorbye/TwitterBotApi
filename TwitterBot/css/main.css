@@ -10,9 +10,10 @@
     color: #1DA1F2;
 }
 
-.home-icons:hover {
-    color: #1c5fc9
-}
+    .home-icons:hover {
+        color: #1a90da;
+        cursor: pointer;
+    }
 
 .twitter, .fa-microsoft {
     color: #1DA1F2;
