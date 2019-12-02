@@ -7,13 +7,13 @@ namespace TwitterBot.Models
     {
         public int Id { get; set; }
 
-        [Column(TypeName = "varchar")]
+        [Column(TypeName = "nvarchar")]
         [MaxLength(40)]
         public string TwitterHandle { get; set; }
 
         public long TwitterUserId { get; set; }
 
-        [Column(TypeName = "varchar")]
+        [Column(TypeName = "nvarchar")]
         [MaxLength(40)]
         public string HandleUser { get; set; }
 
@@ -26,6 +26,8 @@ namespace TwitterBot.Models
         public string OauthSecret { get; set; }
 
         public bool IsAutoRetweetEnabled { get; set; }
+
+        public bool IsPrivateAccount { get; set; }
 
         public TwitterAccount(string handle, long twitterUserId, string handleUser, string oauthToken, string  oauthSecret, bool enableRetweets)
         {

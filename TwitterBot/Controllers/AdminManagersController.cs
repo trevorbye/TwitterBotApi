@@ -5,13 +5,13 @@ namespace TwitterBot.Controllers
 {
     public class AdminManagersController : ApiController
     {
-        private TwitterBotContext db = new TwitterBotContext();
+        private readonly TwitterBotContext _context = new TwitterBotContext();
 
-        [Route("api/init-loader")]
-        [HttpGet]
+        [HttpGet, Route("api/init-loader")]
         public IHttpActionResult InitDb()
         {
-            db.TweetQueues.Find(0);
+            _context.TweetQueues.Find(0);
+
             return Ok();
         }
     }

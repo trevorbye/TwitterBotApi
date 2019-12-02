@@ -160,6 +160,10 @@
     <Compile Include="Migrations\201907052053251_Initial.Designer.cs">
       <DependentUpon>201907052053251_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912022058419_FixEncodingBugAndAddColumn.cs" />
+    <Compile Include="Migrations\201912022058419_FixEncodingBugAndAddColumn.Designer.cs">
+      <DependentUpon>201912022058419_FixEncodingBugAndAddColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdminManager.cs" />
     <Compile Include="Models\TweetQueue.cs" />
@@ -198,6 +202,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201907052053251_Initial.resx">
       <DependentUpon>201907052053251_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912022058419_FixEncodingBugAndAddColumn.resx">
+      <DependentUpon>201912022058419_FixEncodingBugAndAddColumn.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
