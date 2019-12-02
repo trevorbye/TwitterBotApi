@@ -1,11 +1,12 @@
 ﻿using System.Net;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 
 namespace TwitterWebJob
 {
     class Program
     {
-        static void Main()
+        static async Task Main()
         {
             var config = new JobHostConfiguration();
             if (config.IsDevelopment)
@@ -18,7 +19,9 @@ namespace TwitterWebJob
 
             using (var host = new JobHost(config))
             {
-                host.Call(typeof(Functions).GetMethod("ProcessTweets"));
+                await host.CallAsync(
+                    typeof(Functions).GetMethod(
+                        nameof(Functions.ProcessTweets)));
             }
         }
     }
