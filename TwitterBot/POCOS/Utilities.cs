@@ -15,7 +15,7 @@ namespace TwitterBot.POCOS
                 admins => admins.User == preferredUsername) != null;
         }
 
-        public static string UsernameFromClaims(IEnumerable<Claim> claims) =>
+        static string UsernameFromClaims(IEnumerable<Claim> claims) =>
             claims.FirstOrDefault(claim => claim.Type == "preferred_username")
                   ?.Value ?? "";
     }

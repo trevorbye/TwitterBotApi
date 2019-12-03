@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using TwitterBot.Extensions;
 using TwitterBot.Models;
 using TwitterBot.POCOS;
 
@@ -83,8 +84,7 @@ namespace TwitterBot.Controllers
         [HttpGet, Route("api/convert-to-access-token")]
         public async Task<IHttpActionResult> GetTwitterAccessToken(string token, string verifier)
         {
-            var claims = ClaimsPrincipal.Current.Claims;
-            var principle = Utilities.UsernameFromClaims(claims);
+            var principle = User.GetUsername();
 
             var baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
             var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
@@ -232,8 +232,7 @@ namespace TwitterBot.Controllers
 
         (bool ownsHandle, TwitterAccount account) EnsurePrincipleOwnsHandle(string handle)
         {
-            var claims = ClaimsPrincipal.Current.Claims;
-            var principle = Utilities.UsernameFromClaims(claims);
+            var principle = User.GetUsername();
             var account = _databaseContext.TwitterAccounts.FirstOrDefault(table => table.TwitterHandle == handle);
 
             return (account.HandleUser == principle, account);
@@ -242,8 +241,7 @@ namespace TwitterBot.Controllers
         [HttpGet, Route("api/get-user-twitter-accounts")]
         public IHttpActionResult GetUserTwitterAccounts()
         {
-            var claims = ClaimsPrincipal.Current.Claims;
-            var principle = Utilities.UsernameFromClaims(claims);
+            var principle = User.GetUsername();
 
             return Ok(
                 _databaseContext.TwitterAccounts
