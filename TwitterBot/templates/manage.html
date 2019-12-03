@@ -9,7 +9,7 @@
             Log out of Twitter or sign into a different account to add a different handle.
         </p>
 
-        <button class="btn btn-light" ng-click="twitterSignIn()">
+        <button class="btn btn-dark" ng-click="twitterSignIn()">
             <i class="fab fa-twitter fa-md twitter"></i> Sign in with Twitter
         </button>
     </div>
@@ -24,6 +24,10 @@
             retweets, and account deletion.
         </p>
 
+        <div ng-if="isLoadingHandles" class="d-flex p-3 align-items-center border border-common rounded">
+            <strong>Loading twitter accounts...</strong>
+            <div class="spinner-border text-primary ml-auto" role="status" aria-hidden="true"></div>
+        </div>
         <div class="list-group">
             <div ng-repeat="x in handles" class="list-group-item list-group-item-action flex-column align-items-start">
                 <div class="d-flex w-100 justify-content-between align-items-center">
@@ -67,6 +71,10 @@
             that the Tweet has been posted, and no further edits can be made.
         </p>
 
+        <div ng-if="isLoadingQueue" class="d-flex p-3 align-items-center border border-common rounded">
+            <strong>Loading tweet queue...</strong>
+            <div class="spinner-border text-success ml-auto" role="status" aria-hidden="true"></div>
+        </div>
         <div class="list-group scroll-group">
             <div ng-repeat="tweet in tweetQueue" class="list-group-item list-group-item-action flex-column align-items-start">
                 <div class="d-flex w-100 justify-content-between align-items-center">

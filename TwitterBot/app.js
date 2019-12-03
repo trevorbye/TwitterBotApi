@@ -146,8 +146,9 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.manageActive = false;
         $rootScope.devActive = false;
 
+        $scope.isLoadingQueue = true;
         $scope.tweetQueue = [];
-        $scope.handles = [];
+        $scope.handles = [];        
         $scope.tweetSubmitObject = {};
         $scope.error = false;
         $scope.errorMessage = "";
@@ -193,6 +194,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         }
 
                         $scope.tweetQueue = tweets;
+                        $scope.isLoadingQueue = false;
                         $scope.apply;
                     });
                 });
@@ -203,9 +205,10 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 });
 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+                    $scope.isLoadingQueue = false;
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
-                }, function (error) {
+                    }, function (error) {
 
                 });
             });
@@ -316,6 +319,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.manageActive = true;
         $rootScope.devActive = false;
 
+        $scope.isLoadingHandles = true;
+        $scope.isLoadingQueue = true;
         $scope.handles = [];
         $scope.tweetQueue = [];
 
@@ -330,9 +335,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                 $http.get("api/get-user-twitter-accounts", config).then(function (response) {
                     var accounts = response.data;
-                    var index = 0;
                     var uiList = [];
-                    for (index = 0; index < accounts.length; ++index) {
+                    for (let index = 0; index < accounts.length; ++index) {
                         var account = accounts[index];
                         var uiHandleObject = {
                             handle: account.TwitterHandle,
@@ -344,16 +348,15 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                     }
 
                     $scope.handles = uiList;
-                });
+                    $scope.isLoadingHandles = false;
+                }, _ => $scope.isLoadingHandles = false);
 
                 $http.get("api/get-utc-now").then(function (utcRes) {
                     $http.get("api/get-handles-tweet-queue", config).then(function (response) {
 
                         var utcNow = Date.parse(utcRes.data);
                         var tweets = response.data;
-                        var index;
-
-                        for (index = 0; index < tweets.length; ++index) {
+                        for (let index = 0; index < tweets.length; ++index) {
                             var tweet = tweets[index];
                             var utcTweetTime = Date.parse(tweet.CreatedTime + "Z");
                             var elapsedTimeSeconds = (utcNow - utcTweetTime) / 1000;
@@ -380,14 +383,16 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         }
 
                         $scope.tweetQueue = tweets;
+                        $scope.isLoadingQueue = false;
                         $scope.apply;
                     });
                 });
                 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+                    $scope.isLoadingQueue = false;
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
-                }, function (error) {
+                    }, function (error) {
 
                 });
             });
