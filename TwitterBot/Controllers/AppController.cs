@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -126,7 +125,7 @@ namespace TwitterBot.Controllers
                 Method = HttpMethod.Post,
                 Headers =
                 {
-                    {HttpRequestHeader.Authorization.ToString(), authString}
+                    { HttpRequestHeader.Authorization.ToString(), authString }
                 }
             };
 
@@ -246,13 +245,15 @@ namespace TwitterBot.Controllers
             var claims = ClaimsPrincipal.Current.Claims;
             var principle = Utilities.UsernameFromClaims(claims);
 
-            return Ok(_databaseContext.TwitterAccounts
-                        .Where(table => table.HandleUser == principle)
-                        .Select(account => new TwitterAccount
-                        {
-                            TwitterHandle = account.TwitterHandle,
-                            IsAutoRetweetEnabled = account.IsAutoRetweetEnabled
-                        }));
+            return Ok(
+                _databaseContext.TwitterAccounts
+                    .Where(table => table.HandleUser == principle)
+                    .Select(account => new
+                    {
+                        account.TwitterHandle,
+                        account.IsAutoRetweetEnabled,
+                        account.IsPrivateAccount
+                    }));
         }
     }
 }
