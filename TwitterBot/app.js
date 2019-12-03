@@ -1,11 +1,9 @@
 ﻿var clientIdString = "f3031107-74e2-4be0-ae9a-e015c90c42c2";
-var authority = "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47"
+var authority = "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47";
 var clientApplication = new Msal.UserAgentApplication(clientIdString, authority);
 
 (function () {
-
     var twitterBot = angular.module('twitterBot', ['ngRoute']);
-
     twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
         var routeResolve = {
             "auth": function ($window, $q) {
@@ -96,7 +94,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
         //on site load check if active token already exists in cache, then set ui auth state
         var cachedUser = clientApplication.getUser();
-        if (cachedUser != null) {
+        if (cachedUser !== null) {
             $rootScope.user = cachedUser.name;
             $rootScope.loggedIn = true;
         } 
@@ -129,11 +127,11 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
         $scope.manage = function () {
             $location.path("/management-portal");
-        }
+        };
 
         $scope.tweet = function () {
             $location.path("/tweet-portal");
-        }
+        };
     });
 
     twitterBot.controller("dev", function ($rootScope, $http, $location, $scope) {
@@ -148,8 +146,9 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.manageActive = false;
         $rootScope.devActive = false;
 
+        $scope.isLoadingQueue = true;
         $scope.tweetQueue = [];
-        $scope.handles = [];
+        $scope.handles = [];        
         $scope.tweetSubmitObject = {};
         $scope.error = false;
         $scope.errorMessage = "";
@@ -171,7 +170,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         var index;
 
                         for (index = 0; index < tweets.length; ++index) {
-                            var tweet = tweets[index]
+                            var tweet = tweets[index];
                             var utcTweetTime = Date.parse(tweet.CreatedTime + "Z");
                             var elapsedTimeSeconds = (utcNow - utcTweetTime) / 1000;
 
@@ -195,6 +194,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         }
 
                         $scope.tweetQueue = tweets;
+                        $scope.isLoadingQueue = false;
                         $scope.apply;
                     });
                 });
@@ -205,9 +205,10 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 });
 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+                    $scope.isLoadingQueue = false;
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
-                }, function (error) {
+                    }, function (error) {
 
                 });
             });
@@ -216,10 +217,10 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             $scope.error = false;
 
             // client side validation for null fields
-            if ($scope.tweetSubmitObject.handle == null) {
+            if ($scope.tweetSubmitObject.handle === null) {
                 $scope.error = true;
                 $scope.errorMessage = "Handle cannot be empty.";
-            } else if ($scope.tweetSubmitObject.body == null) {
+            } else if ($scope.tweetSubmitObject.body === null) {
                 $scope.error = true;
                 $scope.errorMessage = "Tweet body cannot be empty.";
             } 
@@ -230,7 +231,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             }
 
             var date;
-            if ($scope.tweetSubmitObject.date == null || $scope.tweetSubmitObject.time == null) {
+            if ($scope.tweetSubmitObject.date === null || $scope.tweetSubmitObject.time === null) {
                 date = new Date(Date.now());
             } else {
                 date = new Date($scope.tweetSubmitObject.date);
@@ -243,13 +244,13 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 }
             }
 
-            if ($scope.error == false) {
+            if ($scope.error === false) {
 
                 var tweetQueueObject = {
                     "TwitterHandle": $scope.tweetSubmitObject.handle,
                     "ScheduledStatusTime": date,
                     "StatusBody": $scope.tweetSubmitObject.body
-                }
+                };
 
                 clientApplication.acquireTokenSilent([clientIdString])
                     .then(function (token) {
@@ -318,6 +319,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.manageActive = true;
         $rootScope.devActive = false;
 
+        $scope.isLoadingHandles = true;
+        $scope.isLoadingQueue = true;
         $scope.handles = [];
         $scope.tweetQueue = [];
 
@@ -332,26 +335,29 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                 $http.get("api/get-user-twitter-accounts", config).then(function (response) {
                     var accounts = response.data;
-                    var index = 0;
                     var uiList = [];
-                    for (index = 0; index < accounts.length; index++) {
+                    for (let index = 0; index < accounts.length; ++index) {
                         var account = accounts[index];
-                        var uiHandleObject = { "handle": account.TwitterHandle, "settings": false, "retweet": account.IsAutoRetweetEnabled };
+                        var uiHandleObject = {
+                            handle: account.TwitterHandle,
+                            settings: false,
+                            retweet: account.IsAutoRetweetEnabled,
+                            isPrivate: account.IsPrivateAccount
+                        };
                         uiList.push(uiHandleObject);
                     }
 
                     $scope.handles = uiList;
-                });
+                    $scope.isLoadingHandles = false;
+                }, _ => $scope.isLoadingHandles = false);
 
                 $http.get("api/get-utc-now").then(function (utcRes) {
                     $http.get("api/get-handles-tweet-queue", config).then(function (response) {
 
                         var utcNow = Date.parse(utcRes.data);
                         var tweets = response.data;
-                        var index;
-
-                        for (index = 0; index < tweets.length; ++index) {
-                            var tweet = tweets[index]
+                        for (let index = 0; index < tweets.length; ++index) {
+                            var tweet = tweets[index];
                             var utcTweetTime = Date.parse(tweet.CreatedTime + "Z");
                             var elapsedTimeSeconds = (utcNow - utcTweetTime) / 1000;
 
@@ -377,14 +383,16 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         }
 
                         $scope.tweetQueue = tweets;
+                        $scope.isLoadingQueue = false;
                         $scope.apply;
                     });
                 });
                 
             }, function (error) {
-                clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+                    $scope.isLoadingQueue = false;
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
-                }, function (error) {
+                    }, function (error) {
 
                 });
             });
@@ -435,6 +443,30 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                     $http.get("api/disable-auto-tweets?handle=" + handle, config).then(function (response) {
                         
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
+        $scope.togglePrivateAccount = function (handle, index, isPrivate) {
+            $scope.handles[index].isPrivate = isPrivate;
+
+            clientApplication.acquireTokenSilent([clientIdString])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get(`api/toggle-private-account?handle=${handle}&isPrivate=${isPrivate}`, config).then(function (response) {
+
                     });
                 }, function (error) {
                     clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
@@ -575,8 +607,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         //parses url?oauth_token=TOKEN&oauth_verifier=TOKEN
         var oauthToken = $routeParams.oauth_token;
         var oauthVerifier = $routeParams.oauth_verifier;
-        console.log(oauthToken)
-        console.log(oauthVerifier)
+        console.log(oauthToken);
+        console.log(oauthVerifier);
 
         var params = {
             token: oauthToken,

@@ -23,7 +23,7 @@ namespace TwitterBot.Models
         public DateTime CreatedTime { get; set; }
         public DateTime ScheduledStatusTime { get; set; }
 
-        [Column(TypeName = "varchar")]
+        [Column(TypeName = "nvarchar")]
         [MaxLength(280)]
         public string StatusBody { get; set; }
 

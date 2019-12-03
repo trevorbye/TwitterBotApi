@@ -32,7 +32,12 @@ namespace TwitterWebJob
                 await response.Content
                               .ReadAsAsync<WebJobTweetQueueAccountReturnEntity>();
 
-            var accountsDict = content.Accounts;
+            var accountsDict = content?.Accounts;
+            if (accountsDict is null)
+            {
+                return;
+            }
+
             await Task.WhenAll(
                 content.Tweets
                        .Select(
