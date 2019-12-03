@@ -35,11 +35,20 @@ namespace TwitterBot.Controllers
         }
 
         [HttpGet, Route("api/get-distinct-handles")]
-        public IHttpActionResult GetDistinctHandles() => 
-            Ok(_databaseContext.TwitterAccounts
-                               .Select(table => table.TwitterHandle)
-                               .Distinct()
-                               .ToList());
+        public IHttpActionResult GetDistinctHandles()
+        {
+            var claims = ClaimsPrincipal.Current.Claims;
+            var user = Utilities.UsernameFromClaims(claims);
+
+            var handles =
+                _databaseContext.TwitterAccounts
+                    .Where(account => !account.IsPrivateAccount || account.HandleUser == user)
+                    .Select(table => table.TwitterHandle)
+                    .Distinct()
+                    .ToList();
+
+            return Ok(handles);
+        }
 
         [HttpPost, Route("api/edit-tweet-body")]
         public IHttpActionResult EditTweetByHandleOwner(TweetQueue model)

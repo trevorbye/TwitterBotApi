@@ -197,6 +197,23 @@ namespace TwitterBot.Controllers
             }
         }
 
+        [HttpGet, Route("api/toggle-private-account")]
+        public IHttpActionResult TogglePrivateAccount(string handle, bool isPrivate)
+        {
+            var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            if (!ownsHandle)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                account.IsPrivateAccount = isPrivate;
+                _databaseContext.SaveChanges();
+
+                return Ok();
+            }
+        }
+
         [HttpDelete, Route("api/delete-twitter-account")]
         public IHttpActionResult DeleteTwitterAccount(string handle)
         {

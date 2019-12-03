@@ -334,7 +334,12 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                     var uiList = [];
                     for (index = 0; index < accounts.length; ++index) {
                         var account = accounts[index];
-                        var uiHandleObject = { "handle": account.TwitterHandle, "settings": false, "retweet": account.IsAutoRetweetEnabled };
+                        var uiHandleObject = {
+                            handle: account.TwitterHandle,
+                            settings: false,
+                            retweet: account.IsAutoRetweetEnabled,
+                            isPrivate: account.IsPrivateAccount
+                        };
                         uiList.push(uiHandleObject);
                     }
 
@@ -433,6 +438,30 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                     $http.get("api/disable-auto-tweets?handle=" + handle, config).then(function (response) {
                         
+                    });
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
+        $scope.togglePrivateAccount = function (handle, index, isPrivate) {
+            $scope.handles[index].isPrivate = isPrivate;
+
+            clientApplication.acquireTokenSilent([clientIdString])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.get(`api/toggle-private-account?handle=${handle}&isPrivate=${isPrivate}`, config).then(function (response) {
+
                     });
                 }, function (error) {
                     clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
