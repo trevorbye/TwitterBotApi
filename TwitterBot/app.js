@@ -478,25 +478,27 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         };
 
         $scope.deleteAccount = function (handle, index) {
-            clientApplication.acquireTokenSilent([clientIdString])
-                .then(function (token) {
-                    var config = {
-                        headers: {
-                            'Content-type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        }
-                    };
+            if (confirm(`This will delete the "${handle}" account! 😲`)) {
+                clientApplication.acquireTokenSilent([clientIdString])
+                    .then(function (token) {
+                        var config = {
+                            headers: {
+                                'Content-type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            }
+                        };
 
-                    $http.delete("api/delete-twitter-account?handle=" + handle, config).then(function (response) {
-                        $scope.handles.splice(index, 1);
-                    });
-                }, function (error) {
-                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
-
+                        $http.delete("api/delete-twitter-account?handle=" + handle, config).then(function (response) {
+                            $scope.handles.splice(index, 1);
+                        });
                     }, function (error) {
+                        clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
 
+                        }, function (error) {
+
+                        });
                     });
-                });
+            }
         };
 
         $scope.editTweet = function (tweet, index) {
