@@ -23,8 +23,8 @@ namespace TwitterBot.Controllers
             var timeNowUtc = DateTime.UtcNow;
             var tweetQueues =
                 _databaseContext.TweetQueues
-                                .Where(table => table.IsApprovedByHandle == true)
-                                .Where(table => table.IsPostedByWebJob == false)
+                                .Where(table => table.IsApprovedByHandle)
+                                .Where(table => !table.IsPostedByWebJob)
                                 .Where(table => table.ScheduledStatusTime <= timeNowUtc)
                                 .ToList();
 
