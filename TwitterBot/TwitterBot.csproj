@@ -154,6 +154,7 @@
     <Compile Include="Controllers\UtilController.cs" />
     <Compile Include="Controllers\WebJobController.cs" />
     <Compile Include="Extensions\ClaimsIdentityExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

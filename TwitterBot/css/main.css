@@ -23,6 +23,15 @@
     border: 1px solid rgba(0,0,0,.125);
 }
 
+.settings-pane {
+    margin: -.8rem -1.3rem !important;
+}
+
+    .settings-pane .fas,
+    .settings-pane .collapse {
+        cursor: pointer;
+    }
+
 #redirect-card {
     margin-top: 50px;
 }

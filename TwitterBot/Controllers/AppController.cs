@@ -2,15 +2,11 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using TwitterBot.Extensions;
 using TwitterBot.Models;
-using TwitterBot.POCOS;
 
 namespace TwitterBot.Controllers
 {
@@ -21,14 +17,6 @@ namespace TwitterBot.Controllers
         static readonly string ConsumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
         static readonly string Secret = Environment.GetEnvironmentVariable("SECRET");
         const string Callback = "https://mstwitterbot.azurewebsites.net/add-account-redirect";
-
-        string ShaHash(string value, string signingKey)
-        {
-            using (var hmac = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)))
-            {
-                return Convert.ToBase64String(hmac.ComputeHash(Encoding.ASCII.GetBytes(value)));
-            }
-        }
 
         [HttpGet, Route("api/twitter-auth-token")]
         public async Task<IHttpActionResult> GetTwitterOauthString()
@@ -50,7 +38,7 @@ namespace TwitterBot.Controllers
 
             var signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
             var signingKey = Secret + "&";
-            var oauthSignature = ShaHash(signatureBaseString, signingKey);
+            var oauthSignature = signatureBaseString.ToSecureHash(signingKey);
 
             var authString = "OAuth " +
                 "oauth_callback=" + "\"" + oauthCallback + "\"" + ", " +
@@ -106,7 +94,7 @@ namespace TwitterBot.Controllers
 
             var signatureBaseString = "POST&" + baseUrl + "&" + WebUtility.UrlEncode(paramString);
             var signingKey = Secret + "&" + oauthToken;
-            var oauthSignature = ShaHash(signatureBaseString, signingKey);
+            var oauthSignature = signatureBaseString.ToSecureHash(signingKey);
 
             var authString = "OAuth " +
                 "oauth_consumer_key=" + "\"" + oauthConsumerKey + "\"" + ", " +
