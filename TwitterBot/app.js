@@ -231,7 +231,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             }
 
             var date;
-            if ($scope.tweetSubmitObject.date === null || $scope.tweetSubmitObject.time === null) {
+            if (!$scope.tweetSubmitObject.date || !$scope.tweetSubmitObject.time) {
                 date = new Date(Date.now());
             } else {
                 date = new Date($scope.tweetSubmitObject.date);

@@ -27,6 +27,8 @@ namespace TwitterBot.Models
         [MaxLength(280)]
         public string StatusBody { get; set; }
 
+        public int RetweetNum { get; set; }
+
         public bool IsApprovedByHandle { get; set; }
         public bool IsPostedByWebJob { get; set; }
 
