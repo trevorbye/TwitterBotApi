@@ -21,7 +21,12 @@
                     <i class="fab fa-twitter fa-lg twitter"></i>
                 </span>
             </div>
-            <textarea class="form-control" rows="5" id="body-text" ng-model="tweetSubmitObject.body"></textarea>
+            <textarea class="form-control" rows="5" id="body-text"
+                      ng-keyup="calculateCharsRemaining($event)"
+                      ng-model="tweetSubmitObject.body"></textarea>
+        </div>
+        <div class="input-group mb-3">
+            <span id="charsRemaining" class="badge">0 / 280</span>
         </div>
         <div class="input-group mb-3">
             <label>Leave either date <strong>or</strong> time blank to post the tweet as soon as it's approved.</label>
@@ -34,7 +39,8 @@
             <input type="time" class="form-control" ng-model="tweetSubmitObject.time" />
         </div>
 
-        <button type="button" class="btn btn-success mb-3" ng-click="submitTweet()">Create Tweet</button>
+        <button type="button" ng-disabled="!isValidTweet"
+                class="btn btn-success mb-3 tweet" ng-click="submitTweet()">Create Tweet</button>
 
         <div class="alert alert-danger" role="alert" ng-show="error">
             <strong>Oops!</strong> {{errorMessage}}
@@ -45,7 +51,7 @@
         <h2 class="mb-3">Your tweet queue</h2>
         <p class="mb-3">
             View your current queue of Tweets. The icons indicate whether or not the handle owner has approved your request.
-            You can <b>Delete</b> both approved and unapproved Tweets. The <i class="fab fa-twitter-square fa-lg" style="vertical-align: middle;"></i> indicates
+            You can <b>Delete</b> both approved and unapproved Tweets. The <i class="fab fa-twitter-square fa-lg twitter"></i> indicates
             that the Tweet has been posted and is safe to delete from your queue.
         </p>
 
@@ -73,7 +79,7 @@
                     </span>
                 </div>
                 <div class="mt-2">
-                    <i ng-show="tweet.IsPostedByWebJob" class="fab fa-twitter-square fa-lg" style="vertical-align: middle;"></i>
+                    <i ng-show="tweet.IsPostedByWebJob" class="fab fa-twitter-square fa-lg twitter"></i>
                 </div>
             </div>
         </div>

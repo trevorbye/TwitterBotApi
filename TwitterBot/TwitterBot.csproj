@@ -183,6 +183,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="js\twitter-text-3.0.1.min.js" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\MSTwitterBot - SQL Projects .pubxml" />
     <None Include="Properties\PublishProfiles\MSTwitterBot - Web Deploy.pubxml" />

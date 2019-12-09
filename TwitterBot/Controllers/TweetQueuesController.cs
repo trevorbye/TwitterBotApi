@@ -133,7 +133,7 @@ namespace TwitterBot.Controllers
             tweetQueue.TweetUser = user;
 
             // find twitter account user
-            var account = _databaseContext.TwitterAccounts.Where(table => table.TwitterHandle == tweetQueue.TwitterHandle).FirstOrDefault();
+            var account = _databaseContext.TwitterAccounts.FirstOrDefault(a => a.TwitterHandle == tweetQueue.TwitterHandle);
             tweetQueue.HandleUser = account.HandleUser;
 
             // populate last few object fields

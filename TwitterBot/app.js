@@ -152,6 +152,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $scope.tweetSubmitObject = {};
         $scope.error = false;
         $scope.errorMessage = "";
+        $scope.isValidTweet = false;
 
         clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
@@ -212,6 +213,27 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                 });
             });
+
+        $scope.calculateCharsRemaining = function (e) {
+            const value = $("#body-text").val();
+            const result = twttr.txt.parseTweet(value);
+            if (result) {
+                const maxCharacters = 280;
+                const span = $("#charsRemaining");
+                span.text(`${result.weightedLength} / ${maxCharacters}`);
+                if (result.weightedLength > maxCharacters - 20 &&
+                    result.weightedLength <= maxCharacters) {
+                    span.removeClass("badge-danger").addClass("badge-warning");
+                } else if (result.weightedLength > maxCharacters) {
+                    span.removeClass("badge-warning").addClass("badge-danger");
+                } else {
+                    span.removeClass("badge-warning badge-danger");
+                }
+
+                const isValidLength = result.weightedLength <= maxCharacters;
+                $scope.isValidTweet = isValidLength && result.valid;
+            }
+        };
 
         $scope.submitTweet = function () {
             $scope.error = false;
