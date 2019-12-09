@@ -16,7 +16,7 @@
     }
 
 .tweet {
-    cursor: not-allowed;
+    cursor: pointer;
 }
 
 .tweet:disabled {
