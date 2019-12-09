@@ -24,7 +24,7 @@ namespace TwitterBot.Models
         public DateTime ScheduledStatusTime { get; set; }
 
         [Column(TypeName = "nvarchar")]
-        [MaxLength(280)]
+        [MaxLength(1000)]
         public string StatusBody { get; set; }
 
         public int RetweetNum { get; set; }
