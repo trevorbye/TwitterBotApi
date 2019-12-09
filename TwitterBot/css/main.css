@@ -15,6 +15,14 @@
         cursor: pointer;
     }
 
+.tweet {
+    cursor: pointer;
+}
+
+.tweet:disabled {
+    cursor: not-allowed;
+}
+
 .twitter, .fa-microsoft {
     color: #1DA1F2;
 }
