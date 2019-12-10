@@ -1,7 +1,8 @@
 ﻿using Microsoft.Owin.Security.OAuth;
 using Owin;
 using System.Configuration;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Owin.Security.Jwt;
 
 namespace TwitterBot
 {
@@ -17,7 +18,11 @@ namespace TwitterBot
             
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
             {
-                AccessTokenFormat = new Microsoft.Owin.Security.Jwt.JwtFormat(tvps, new OpenIdConnectCachingSecurityTokenProvider("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")),
+                AccessTokenFormat = 
+                    new JwtFormat(
+                        tvps, 
+                        new OpenIdConnectCachingSecurityTokenProvider(
+                            "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")),
             });
         }
     }

@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
-using System.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Protocols;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TwitterBot
 {
-    public class OpenIdConnectCachingSecurityTokenProvider : IIssuerSecurityTokenProvider
+    // This class is necessary because the OAuthBearer Middleware does not leverage
+    // the OpenID Connect metadata endpoint exposed by the STS by default.
+    public class OpenIdConnectCachingSecurityTokenProvider : IIssuerSecurityKeyProvider
     {
         public ConfigurationManager<OpenIdConnectConfiguration> _configManager;
         private string _issuer;
-        private IEnumerable<SecurityToken> _tokens;
+        private IEnumerable<SecurityKey> _keys;
         private readonly string _metadataEndpoint;
 
         private readonly ReaderWriterLockSlim _synclock = new ReaderWriterLockSlim();
@@ -19,11 +22,17 @@ namespace TwitterBot
         public OpenIdConnectCachingSecurityTokenProvider(string metadataEndpoint)
         {
             _metadataEndpoint = metadataEndpoint;
-            _configManager = new ConfigurationManager<OpenIdConnectConfiguration>(metadataEndpoint);
+            _configManager = new ConfigurationManager<OpenIdConnectConfiguration>(metadataEndpoint, new OpenIdConnectConfigurationRetriever());
 
             RetrieveMetadata();
         }
 
+        /// <summary>
+        /// Gets the issuer the credentials are for.
+        /// </summary>
+        /// <value>
+        /// The issuer the credentials are for.
+        /// </value>
         public string Issuer
         {
             get
@@ -41,7 +50,13 @@ namespace TwitterBot
             }
         }
 
-        public IEnumerable<SecurityToken> SecurityTokens
+        /// <summary>
+        /// Gets all known security keys.
+        /// </summary>
+        /// <value>
+        /// All known security keys.
+        /// </value>
+        public IEnumerable<SecurityKey> SecurityKeys
         {
             get
             {
@@ -49,7 +64,7 @@ namespace TwitterBot
                 _synclock.EnterReadLock();
                 try
                 {
-                    return _tokens;
+                    return _keys;
                 }
                 finally
                 {
@@ -63,9 +78,9 @@ namespace TwitterBot
             _synclock.EnterWriteLock();
             try
             {
-                var config = Task.Run(_configManager.GetConfigurationAsync).Result;
+                OpenIdConnectConfiguration config = Task.Run(_configManager.GetConfigurationAsync).Result;
                 _issuer = config.Issuer;
-                _tokens = config.SigningTokens;
+                _keys = config.SigningKeys;
             }
             finally
             {
