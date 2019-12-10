@@ -11,7 +11,8 @@
             <div class="input-group-prepend">
                 <label class="input-group-text" for="handleSelect">Twitter handle</label>
             </div>
-            <select class="custom-select" id="handleSelect" ng-model="tweetSubmitObject.handle">
+            <select class="custom-select" id="handleSelect"
+                    ng-change="checkTweetValidity($event)" ng-model="tweetSubmitObject.handle">
                 <option ng-repeat="handle in handles" value="{{handle}}">{{handle}}</option>
             </select>
         </div>
@@ -22,7 +23,7 @@
                 </span>
             </div>
             <textarea class="form-control" rows="5" id="body-text"
-                      ng-keyup="calculateCharsRemaining($event)"
+                      ng-keyup="checkTweetValidity($event)"
                       ng-model="tweetSubmitObject.body"></textarea>
         </div>
         <div class="input-group mb-3">

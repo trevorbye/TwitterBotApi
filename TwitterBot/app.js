@@ -214,7 +214,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 });
             });
 
-        $scope.calculateCharsRemaining = function (e) {
+        $scope.checkTweetValidity = function (e) {
             const value = $("#body-text").val();
             const result = twttr.txt.parseTweet(value);
             if (result) {
@@ -231,7 +231,11 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 }
 
                 const isValidLength = result.weightedLength <= maxCharacters;
-                $scope.isValidTweet = isValidLength && result.valid;
+                $scope.isValidTweet = isValidLength
+                    && result.valid
+                    && $scope.tweetSubmitObject.handle;
+            } else {
+                $scope.isValidTweet = false;
             }
         };
 
