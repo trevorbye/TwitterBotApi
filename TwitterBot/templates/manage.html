@@ -43,19 +43,21 @@
                         </div>
                         <div class="d-flex w-100 justify-content-between mb-3">
                             <p class="my-auto">Delete account</p>
-                            <button type="button" class="btn btn-danger my-auto" ng-click="deleteAccount(x.handle, $index)">
+                            <button type="button" class="btn btn-danger my-auto" data-handle="{{x.handle}}" data-index="{{$index}}"
+                                    data-toggle="modal" data-target="#delete">
                                 Delete &nbsp; <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
 
                         <div class="d-flex w-100 justify-content-between mb-3">
-                            <p class="my-auto">Enable automatic <span class="twitter">@mention</span> retweets <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="When toggled on, this account will automatically retweet, tweets where this account is mentioned."></i></p>
+                            <p class="my-auto">Enable automatic <span class="twitter">@mention</span> retweets <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true"
+                                                                                                                  title="When toggled on, if tweets originating from this <b>Twitter Bot</b> mention <span class='twitter'>{{x.handle}}</span> they will be automatically retweeted."></i></p>
                             <i class="fas fa-toggle-on fa-2x" ng-click="disableAutoTweets(x.handle, $index)" ng-show="x.retweet" style="vertical-align: middle;"></i>
                             <i class="fas fa-toggle-off fa-2x" ng-click="enableAutoTweets(x.handle, $index)" ng-show="!x.retweet" style="vertical-align: middle;"></i>
                         </div>
 
                         <div class="d-flex w-100 justify-content-between mb-3">
-                            <p class="my-auto">Private account <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="When toggled on, this account is hidden to other users within the system."></i></p>
+                            <p class="my-auto">Private account <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true" title="When toggled on, this account is <b>hidden</b> to other users within the system. This is commonly used for <i>personal</i> accounts."></i></p>
                             <i class="fas fa-toggle-on fa-2x" ng-click="togglePrivateAccount(x.handle, $index, false)" ng-show="x.isPrivate" style="vertical-align: middle;"></i>
                             <i class="fas fa-toggle-off fa-2x" ng-click="togglePrivateAccount(x.handle, $index, true)" ng-show="!x.isPrivate" style="vertical-align: middle;"></i>
                         </div>                        
@@ -142,6 +144,24 @@
                 <div class="mt-2">
                     <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded" class="fab fa-twitter-square fa-lg twitter"></i>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="deleteAccount()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
             </div>
         </div>
     </div>
