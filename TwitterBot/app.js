@@ -20,24 +20,26 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             }
         };
 
+        const cacheBustSuffix = Date.now();
+
         $routeProvider.when('/', {
-            templateUrl: 'templates/login.html',
+            templateUrl: `templates/login.html?t-${cacheBustSuffix}`,
             controller: 'login',
             controllerAs: 'controller'
         }).when('/home', {
-            templateUrl: 'templates/home.html',
+            templateUrl: `templates/home.html?t-${cacheBustSuffix}`,
             controller: 'home',
             resolve: routeResolve
         }).when('/tweet-portal', {
-            templateUrl: 'templates/tweets.html',
+            templateUrl: `templates/tweets.html?t-${cacheBustSuffix}`,
             controller: 'tweets',
             resolve: routeResolve
         }).when('/management-portal', {
-            templateUrl: 'templates/manage.html',
+            templateUrl: `templates/manage.html?t-${cacheBustSuffix}`,
             controller: 'manage',
             resolve: routeResolve
         }).when('/development', {
-            templateUrl: 'templates/dev.html',
+            templateUrl: `templates/dev.html?t-${cacheBustSuffix}`,
             controller: 'dev',
             resolve: routeResolve
         }).when('/add-account-redirect', {
@@ -45,11 +47,11 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             controller: 'redirect',
             resolve: routeResolve
         }).when('/not-found', {
-            templateUrl: 'templates/404.html',
+            templateUrl: `templates/404.html?t-${cacheBustSuffix}`,
             controller: 'redirect',
             resolve: routeResolve
         }).otherwise({
-                redirectTo: "/not-found"
+            redirectTo: "/not-found"
         });
 
         $locationProvider.html5Mode(true);
