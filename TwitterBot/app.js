@@ -352,6 +352,20 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $scope.handles = [];
         $scope.tweetQueue = [];
 
+        $('#delete').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const handle = button.data('handle');
+            const index = button.data('index');
+
+            var modal = $(this);
+            modal.find('.modal-body')
+                .html(`<p>Are you sure you want to delete the <span class="twitter">${handle}</span> account 😲?</p>`);
+
+            const deleteBtn = modal.find('.modal-footer .btn-danger');
+            deleteBtn.data('handle', handle);
+            deleteBtn.data('index', index);
+        });
+
         clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
                 var config = {
@@ -507,28 +521,30 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 });
         };
 
-        $scope.deleteAccount = function (handle, index) {
-            if (confirm(`This will delete the "${handle}" account! 😲`)) {
-                clientApplication.acquireTokenSilent([clientIdString])
-                    .then(function (token) {
-                        var config = {
-                            headers: {
-                                'Content-type': 'application/json',
-                                'Authorization': 'Bearer ' + token
-                            }
-                        };
+        $scope.deleteAccount = function () {            
+            const deleteBtn = $('.modal-footer .btn-danger');
+            const handle = deleteBtn.data('handle');
+            const index = deleteBtn.data('index');
 
-                        $http.delete("api/delete-twitter-account?handle=" + handle, config).then(function (response) {
-                            $scope.handles.splice(index, 1);
-                        });
-                    }, function (error) {
-                        clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+            clientApplication.acquireTokenSilent([clientIdString])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
 
-                        }, function (error) {
-
-                        });
+                    $http.delete(`api/delete-twitter-account?handle=${handle}`, config).then(function (response) {
+                        $scope.handles.splice(index, 1);
                     });
-            }
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
         };
 
         $scope.editTweet = function (tweet, index) {
