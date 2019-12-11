@@ -49,13 +49,13 @@
                         </div>
 
                         <div class="d-flex w-100 justify-content-between mb-3">
-                            <p class="my-auto">Enable automatic <span style="color:#1DA1F2;">@mention</span> retweets</p>
+                            <p class="my-auto">Enable automatic <span class="twitter">@mention</span> retweets <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="When toggled on, this account will automatically retweet, tweets where this account is mentioned."></i></p>
                             <i class="fas fa-toggle-on fa-2x" ng-click="disableAutoTweets(x.handle, $index)" ng-show="x.retweet" style="vertical-align: middle;"></i>
                             <i class="fas fa-toggle-off fa-2x" ng-click="enableAutoTweets(x.handle, $index)" ng-show="!x.retweet" style="vertical-align: middle;"></i>
                         </div>
 
                         <div class="d-flex w-100 justify-content-between mb-3">
-                            <p class="my-auto">Private account</p>
+                            <p class="my-auto">Private account <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" title="When toggled on, this account is hidden to other users within the system."></i></p>
                             <i class="fas fa-toggle-on fa-2x" ng-click="togglePrivateAccount(x.handle, $index, false)" ng-show="x.isPrivate" style="vertical-align: middle;"></i>
                             <i class="fas fa-toggle-off fa-2x" ng-click="togglePrivateAccount(x.handle, $index, true)" ng-show="!x.isPrivate" style="vertical-align: middle;"></i>
                         </div>                        
@@ -77,7 +77,7 @@
         <p class="mb-3">
             These are all current Tweets that users have requested to post to any of your configured Twitter accounts.
             Approve the request to post the Tweet at the scheduled time. You can edit the content of a tweet, and cancel your approval
-            up until the scheduled post time. The <i class="fab fa-twitter-square fa-lg" style="vertical-align: middle;"></i> indicates
+            up until the scheduled post time. The <i class="fab fa-twitter-square fa-lg twitter"></i> indicates
             that the Tweet has been posted, and no further edits can be made.
         </p>
 
@@ -130,7 +130,7 @@
                             <button type="button" class="btn btn-primary btn-sm" ng-click="editTweet(tweet, $index)">Save</button>
                         </span>
                         <span>
-                            <i class="fas fa-compress fa-lg" ng-click="tweet.EditPaneExpanded = false" style="vertical-align: middle;"></i>
+                            <i class="fas fa-compress fa-lg" ng-click="tweet.EditPaneExpanded = false"></i>
                         </span>
                     </div>
 
@@ -140,7 +140,7 @@
                 </div>
 
                 <div class="mt-2">
-                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded" class="fab fa-twitter-square fa-lg" style="vertical-align: middle;"></i>
+                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded" class="fab fa-twitter-square fa-lg twitter"></i>
                 </div>
             </div>
         </div>

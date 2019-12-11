@@ -425,10 +425,12 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
         $scope.expandSettings = function (index) {
             $scope.handles[index].settings = true;
+            $('[data-toggle="tooltip"]').tooltip();
         };
 
         $scope.hideSettings = function (index) {
             $scope.handles[index].settings = false;
+            $('[data-toggle="tooltip"]').tooltip();
         };
 
         $scope.enableAutoTweets = function (handle, index) {
