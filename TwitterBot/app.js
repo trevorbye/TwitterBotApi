@@ -88,7 +88,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.manageText = "Manage";
         $rootScope.tweetText = "Tweet";
         $rootScope.logoutText = "Logout";
-        $rootScope.devText = "Development";
+        $rootScope.devText = "Info";
 
         // db init request 
         $http.get("api/init-loader").then(function (response) {
