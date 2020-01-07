@@ -26,6 +26,10 @@ namespace TwitterWebJob
             IDictionary<string, WebJobTwitterAccount> accountsDict,
             string bearer)
         {
+            bool isRetweet = false;
+            if (tweetQueue.RetweetNum != 0) {
+                isRetweet = true;
+            }
             var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
             var oauthNonce = WebUtility.UrlEncode(Guid.NewGuid().ToString("N"));
             var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
@@ -34,18 +38,37 @@ namespace TwitterWebJob
             var webJobTwitterAccount = accountsDict[tweetQueue.HandleUser];
             var oauthToken = WebUtility.UrlEncode(webJobTwitterAccount.OauthToken);
             var oauthSecret = WebUtility.UrlEncode(webJobTwitterAccount.OauthSecret);
-            var status = Uri.EscapeDataString(tweetQueue.StatusBody);
-            var baseUrl = "https://api.twitter.com/1.1/statuses/update.json";
 
-            var paramString =
-                "oauth_consumer_key=" + oauthConsumerKey + "&" +
-                "oauth_nonce=" + oauthNonce + "&" +
-                "oauth_signature_method=" + sigMethod + "&" +
-                "oauth_timestamp=" + timestamp + "&" +
-                "oauth_token=" + oauthToken + "&" +
-                "oauth_version=" + version + "&" +
-                "status=" + status;
+            string baseUrl;
+            string paramString;
+            string status;
+            if (isRetweet)
+            {
+                baseUrl = $"https://api.twitter.com/1.1/statuses/retweet/{tweetQueue.RetweetNum}.json";
+                status = "";
+                paramString =
+                    "oauth_consumer_key=" + oauthConsumerKey + "&" +
+                    "oauth_nonce=" + oauthNonce + "&" +
+                    "oauth_signature_method=" + sigMethod + "&" +
+                    "oauth_timestamp=" + timestamp + "&" +
+                    "oauth_token=" + oauthToken + "&" +
+                    "oauth_version=" + version;
+            }
+            else 
+            {
+                status = Uri.EscapeDataString(tweetQueue.StatusBody);
+                baseUrl = "https://api.twitter.com/1.1/statuses/update.json";
 
+                paramString =
+                    "oauth_consumer_key=" + oauthConsumerKey + "&" +
+                    "oauth_nonce=" + oauthNonce + "&" +
+                    "oauth_signature_method=" + sigMethod + "&" +
+                    "oauth_timestamp=" + timestamp + "&" +
+                    "oauth_token=" + oauthToken + "&" +
+                    "oauth_version=" + version + "&" +
+                    "status=" + status;
+            }
+            
             var signatureBaseString =
                 $"POST&{WebUtility.UrlEncode(baseUrl)}&{WebUtility.UrlEncode(paramString)}";
             var signingKey = $"{Secret}&{oauthSecret}";
@@ -61,9 +84,19 @@ namespace TwitterWebJob
                 "oauth_version=" + "\"" + version + "\"";
 
             var client = new HttpClient();
+            Uri uri;
+            if (isRetweet)
+            {
+                uri = new Uri(baseUrl);
+            }
+            else
+            {
+                uri = new Uri($"{baseUrl}?status={status}");
+            }
+
             var request = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}?status={status}"),
+                RequestUri = uri,
                 Method = HttpMethod.Post,
                 Headers =
                 {

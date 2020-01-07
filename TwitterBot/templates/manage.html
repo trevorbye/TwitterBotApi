@@ -79,8 +79,8 @@
         <p class="mb-3">
             These are all current Tweets that users have requested to post to any of your configured Twitter accounts.
             Approve the request to post the Tweet at the scheduled time. You can edit the content of a tweet, and cancel your approval
-            up until the scheduled post time. The <i class="fab fa-twitter-square fa-lg twitter"></i> indicates
-            that the Tweet has been posted, and no further edits can be made.
+            up until the scheduled post time. <i class="fab fa-twitter-square fa-lg twitter"></i> means
+            the Tweet has been posted as a status, and <i class="fas fa-retweet fa-lg twitter"></i> means it has been re-tweeted.
         </p>
 
         <div ng-if="isLoadingQueue" class="d-flex p-3 align-items-center border border-common rounded">
@@ -142,7 +142,8 @@
                 </div>
 
                 <div class="mt-2">
-                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded" class="fab fa-twitter-square fa-lg twitter"></i>
+                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded && tweet.RetweetNum == 0" class="fab fa-twitter-square fa-lg twitter"></i>
+                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded && tweet.RetweetNum > 0" class="fas fa-retweet fa-lg twitter"></i>
                 </div>
             </div>
         </div>
