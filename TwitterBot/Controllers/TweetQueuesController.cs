@@ -95,12 +95,19 @@ namespace TwitterBot.Controllers
             if (operationType == "approve")
             {
                 tweetQueue.IsApprovedByHandle = true;
-                NotificationService.SendApprovalNotif(tweetQueue);
+
+                if (tweetQueue.TweetUser != "AutoRetweetService")
+                {
+                    NotificationService.SendApprovalNotif(tweetQueue);
+                }
             }
             else
             {
                 tweetQueue.IsApprovedByHandle = false;
-                NotificationService.SendCancelNotif(tweetQueue);
+                if (tweetQueue.TweetUser != "AutoRetweetService")
+                {
+                    NotificationService.SendCancelNotif(tweetQueue);
+                }
             }
 
             _databaseContext.SaveChanges();
