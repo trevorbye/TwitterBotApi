@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterBot", "TwitterBot\TwitterBot.csproj", "{715D10E9-1E4B-4302-AF7E-91BA299C67B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterWebJob", "TwitterWebJob\TwitterWebJob.csproj", "{58931574-05DF-4C50-A6AA-DEE8CAA24C8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MentionWebJob", "MentionWebJob\MentionWebJob.csproj", "{AA67E128-6847-447E-A590-C7EBA8318660}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{58931574-05DF-4C50-A6AA-DEE8CAA24C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58931574-05DF-4C50-A6AA-DEE8CAA24C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58931574-05DF-4C50-A6AA-DEE8CAA24C8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA67E128-6847-447E-A590-C7EBA8318660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA67E128-6847-447E-A590-C7EBA8318660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA67E128-6847-447E-A590-C7EBA8318660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA67E128-6847-447E-A590-C7EBA8318660}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

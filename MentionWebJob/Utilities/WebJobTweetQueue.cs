@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TwitterWebJob
+namespace MentionWebJob
 {
     public class WebJobTweetQueue
     {

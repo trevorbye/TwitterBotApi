@@ -27,6 +27,10 @@ namespace TwitterBot.Models
 
         public bool IsAutoRetweetEnabled { get; set; }
 
+        // this field keeps track of the last-fetched tweet in the mention timeline. This is used in the api call that grabs the mentions timeline, to avoid adding retweets to someones queue that have 
+        // already been added previously
+        public long RetweetSinceId { get; set; }
+
         public bool IsPrivateAccount { get; set; }
 
         public TwitterAccount(string handle, long twitterUserId, string handleUser, string oauthToken, string  oauthSecret, bool enableRetweets)

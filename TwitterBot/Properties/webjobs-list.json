@@ -3,6 +3,9 @@
   "WebJobs": [
     {
       "filePath": "../TwitterWebJob/TwitterWebJob.csproj"
+    },
+    {
+      "filePath": "../MentionWebJob/MentionWebJob.csproj"
     }
   ]
 }

@@ -1,4 +1,4 @@
-﻿namespace TwitterWebJob
+﻿namespace MentionWebJob
 {
     public class WebJobTwitterAccount
     {

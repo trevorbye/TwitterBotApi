@@ -27,7 +27,8 @@ namespace TwitterBot.Models
         [MaxLength(1000)]
         public string StatusBody { get; set; }
 
-        public int RetweetNum { get; set; }
+        // this field is used to signal that this is a @mention tweet, and also holds the tweetId that a service would use to retweet this particular tweet.
+        public long RetweetNum { get; set; }
 
         public bool IsApprovedByHandle { get; set; }
         public bool IsPostedByWebJob { get; set; }

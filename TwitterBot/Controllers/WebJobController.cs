@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using TwitterBot.Models;
+using TwitterBot.POCOS;
 
 namespace TwitterBot.Controllers
 {
@@ -10,6 +11,7 @@ namespace TwitterBot.Controllers
     {
         readonly TwitterBotContext _databaseContext = new TwitterBotContext();
         static readonly string BearerToken = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
+
 
         [HttpGet, Route("api/webjob-fetch-queue")]
         public IHttpActionResult FetchTweetQueueAndAccounts()
@@ -38,6 +40,51 @@ namespace TwitterBot.Controllers
             var returnEntity = new TweetQueueAccountReturnEntity(tweetQueues, accountDict);
 
             return Ok(returnEntity);
+        }
+
+        [HttpGet, Route("api/mention-webjob-fetch-accounts")]
+        public IHttpActionResult FetchUniqueAccounts()
+        {
+            var authToken = Request.Headers.Authorization.Parameter;
+            if (authToken != BearerToken || authToken is null)
+            {
+                return Unauthorized();
+            }
+
+            var uniqueAccounts = _databaseContext.TwitterAccounts.Where(table => table.IsAutoRetweetEnabled).ToList();
+            return Ok(uniqueAccounts);
+        }
+
+        [HttpPost, Route("api/post-retweet")]
+        public IHttpActionResult PostRetweet(long newSinceId, int accountId, long retweetId, string tweetBody)
+        {
+            var authToken = Request.Headers.Authorization.Parameter;
+            if (authToken != BearerToken || authToken is null)
+            {
+                return Unauthorized();
+            }
+
+            var account = _databaseContext.TwitterAccounts.Find(accountId);
+            account.RetweetSinceId = newSinceId;
+
+            // build new tweetqueue object
+            TweetQueue tweet = new TweetQueue();
+            tweet.HandleUser = account.HandleUser;
+            tweet.StatusBody = tweetBody;
+            tweet.TwitterHandle = account.TwitterHandle;
+            tweet.TweetUser = "AutoRetweetService";
+            tweet.RetweetNum = retweetId;
+
+            tweet.CreatedTime = DateTime.UtcNow;
+            tweet.ScheduledStatusTime = DateTime.UtcNow;
+            tweet.IsApprovedByHandle = false;
+            tweet.IsPostedByWebJob = false;
+
+            _databaseContext.TweetQueues.Add(tweet);
+            _databaseContext.SaveChanges();
+
+            NotificationService.SendNotificationToHandle(tweet);
+            return Ok();
         }
 
         [HttpGet, Route("api/webjob-mark-complete")]
