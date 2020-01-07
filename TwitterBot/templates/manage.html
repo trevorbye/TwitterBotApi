@@ -51,7 +51,7 @@
 
                         <div class="d-flex w-100 justify-content-between mb-3">
                             <p class="my-auto">Enable automatic <span class="twitter">@mention</span> retweets <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true"
-                                                                                                                  title="When toggled on, if tweets originating from this <b>Twitter Bot</b> mention <span class='twitter'>{{x.handle}}</span> they will be automatically retweeted."></i></p>
+                                                                                                                  title="When toggled on, any tweet mentioning <span class='twitter'>{{x.handle}}</span> will be added to your queue. Approving will automatically retweet the mention."></i></p>
                             <i class="fas fa-toggle-on fa-2x" ng-click="disableAutoTweets(x.handle, $index)" ng-show="x.retweet" style="vertical-align: middle;"></i>
                             <i class="fas fa-toggle-off fa-2x" ng-click="enableAutoTweets(x.handle, $index)" ng-show="!x.retweet" style="vertical-align: middle;"></i>
                         </div>
@@ -106,14 +106,14 @@
                 </div>
                 <div class="d-flex w-100 justify-content-between mt-3" ng-hide="tweet.EditPaneExpanded || tweet.IsPostedByWebJob">
                     <span>
-                        <button ng-show="!tweet.IsApprovedByHandle" type="button" class="btn btn-primary btn-sm" ng-click="approveTweet(tweet.Id, $index)">Approve</button>
+                        <button ng-show="!tweet.IsApprovedByHandle" type="button" ng-class="{'btn btn-primary btn-sm': tweet.RetweetNum==0, 'btn btn-warning btn-sm': tweet.RetweetNum>0}" ng-click="approveTweet(tweet.Id, $index)">{{tweet.RetweetNum == 0 ? 'Approve' : 'Approve and retweet'}}</button>
                         <button ng-show="tweet.IsApprovedByHandle" type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Cancel</button>
 
                         <i ng-show="!tweet.IsApprovedByHandle" class="fas fa-times-circle fa-lg" style="vertical-align: middle;"></i>
                         <i ng-show="tweet.IsApprovedByHandle" class="fas fa-check fa-lg" style="vertical-align: middle;"></i>
                     </span>
                     <span>
-                        <button type="button" ng-show="!tweet.IsPostedByWebJob" class="btn btn-primary btn-sm" ng-click="tweet.EditPaneExpanded = true">Edit</button>
+                        <button type="button" ng-show="!tweet.IsPostedByWebJob && tweet.RetweetNum == 0" class="btn btn-primary btn-sm" ng-click="tweet.EditPaneExpanded = true">Edit</button>
                     </span>
                 </div>
 

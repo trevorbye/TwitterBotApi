@@ -38,8 +38,10 @@ namespace MentionWebJob
 
             // if null, reset to 1 to avoid API error
             var retweetSinceId = account.RetweetSinceId;
+            bool hasRetweetHistory = true;
             if (retweetSinceId == 0)
             {
+                hasRetweetHistory = false;
                 retweetSinceId = 1;
             }
             var baseUrl = "https://api.twitter.com/1.1/statuses/mentions_timeline.json";
@@ -101,22 +103,46 @@ namespace MentionWebJob
                 counter++;
             }
 
-            //make api calls to webjob controller
-            foreach (Tuple<long, string> mention in mentions)
+            if (hasRetweetHistory)
             {
-                string encodedTweet = WebUtility.UrlEncode(mention.Item2);
-                var serviceRequest = new HttpRequestMessage
+                //make api calls to webjob controller
+                foreach (Tuple<long, string> mention in mentions)
                 {
-                    RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/post-retweet?newSinceId={newSinceId}&accountId={account.Id}&retweetId={mention.Item1}&tweetBody={encodedTweet}"),
-                    Method = HttpMethod.Post,
-                    Headers =
+                    string encodedTweet = WebUtility.UrlEncode(mention.Item2);
+                    var serviceRequest = new HttpRequestMessage
+                    {
+                        RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/post-retweet?newSinceId={newSinceId}&accountId={account.Id}&retweetId={mention.Item1}&tweetBody={encodedTweet}"),
+                        Method = HttpMethod.Post,
+                        Headers =
                     {
                         { HttpRequestHeader.Authorization.ToString(), bearer }
                     }
-                };
+                    };
 
-                await client.SendAsync(serviceRequest);
-            }
+                    await client.SendAsync(serviceRequest);
+                }
+            } else
+            {
+                // if they don't have a retweet history, we don't want to spam them with the accounts lifetime of mentions. 
+                // give the newest mention only, and next time it will pick up from there and include any new ones from then on
+                if (mentions.Count > 0)
+                {
+                    // only do one call for the first mention
+                    var mention = mentions[0];
+                    string encodedTweet = WebUtility.UrlEncode(mention.Item2);
+                    var serviceRequest = new HttpRequestMessage
+                    {
+                        RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/post-retweet?newSinceId={newSinceId}&accountId={account.Id}&retweetId={mention.Item1}&tweetBody={encodedTweet}"),
+                        Method = HttpMethod.Post,
+                        Headers =
+                    {
+                        { HttpRequestHeader.Authorization.ToString(), bearer }
+                    }
+                    };
+
+                    await client.SendAsync(serviceRequest);
+                }
+            } 
         }
     }
 }
