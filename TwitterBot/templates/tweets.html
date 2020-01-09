@@ -17,6 +17,7 @@
             </select>
         </div>
         <div class="input-group mb-3">
+            <label class="sr-only" for="body-text">Tweet text</label>
             <div class="input-group-prepend">
                 <span class="input-group-text">
                     <i class="fab fa-twitter fa-lg twitter"></i>
@@ -31,13 +32,15 @@
         </div>
         <div class="input-group mb-3">
             <label>Leave either date <strong>or</strong> time blank to post the tweet as soon as it's approved.</label>
+            <label class="sr-only" for="tweet-date">Schedule tweet date</label>
+            <label class="sr-only" for="tweet-time">Schedule tweet time</label>
             <div class="input-group-prepend">
                 <span class="input-group-text">
                     Scheduled date & time
                 </span>
             </div>
-            <input type="date" max="3000-12-31" min="1000-01-01" class="form-control" ng-model="tweetSubmitObject.date">
-            <input type="time" class="form-control" ng-model="tweetSubmitObject.time" />
+            <input id="tweet-date" type="date" max="3000-12-31" min="1000-01-01" class="form-control" ng-model="tweetSubmitObject.date">
+            <input id="tweet-time" type="time" class="form-control" ng-model="tweetSubmitObject.time" />
         </div>
 
         <button type="button" ng-disabled="!isValidTweet"
