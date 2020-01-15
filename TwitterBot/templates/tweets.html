@@ -74,7 +74,7 @@
                     </span>
 
                     <span>
-                        <button type="button" class="btn btn-primary btn-sm" ng-click="cancelTweet(tweet.Id, $index)">Delete</button>
+                        <i class="fas fa-trash-alt trash-hover" ng-click="cancelTweet(tweet.Id, $index)"></i>
                         <i ng-show="!tweet.IsApprovedByHandle" class="fas fa-times-circle fa-lg" style="vertical-align: middle;"></i>
                         <i ng-show="tweet.IsApprovedByHandle" class="fas fa-check fa-lg" style="vertical-align: middle;"></i>
                     </span>

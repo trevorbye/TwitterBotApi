@@ -114,6 +114,7 @@
                     </span>
                     <span>
                         <button type="button" ng-show="!tweet.IsPostedByWebJob && tweet.RetweetNum == 0" class="btn btn-primary btn-sm" ng-click="tweet.EditPaneExpanded = true">Edit</button>
+                        <i class="fas fa-trash-alt ml-1 trash-hover" ng-click="deleteTweet(tweet.Id, $index)"></i>
                     </span>
                 </div>
 
@@ -141,9 +142,14 @@
                     </div>
                 </div>
 
-                <div class="mt-2">
-                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded && tweet.RetweetNum == 0" class="fab fa-twitter-square fa-lg twitter"></i>
-                    <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded && tweet.RetweetNum > 0" class="fas fa-retweet fa-lg twitter"></i>
+                <div class="d-flex w-100 justify-content-between mt-2">
+                    <span>
+                        <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded && tweet.RetweetNum == 0" class="fab fa-twitter-square fa-lg twitter"></i>
+                        <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded && tweet.RetweetNum > 0" class="fas fa-retweet fa-lg twitter"></i>
+                    </span>
+                    <span>
+                        <i ng-show="tweet.IsPostedByWebJob && !tweet.EditPaneExpanded" class="fas fa-trash-alt trash-hover" ng-click="deleteTweet(tweet.Id, $index)"></i>
+                    </span>
                 </div>
             </div>
         </div>

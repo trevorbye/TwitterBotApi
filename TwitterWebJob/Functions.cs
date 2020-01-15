@@ -32,8 +32,8 @@ namespace TwitterWebJob
                 await response.Content
                               .ReadAsAsync<WebJobTweetQueueAccountReturnEntity>();
 
-            var accountsDict = content?.Accounts;
-            if (accountsDict is null)
+            var accountsList = content?.Accounts;
+            if (accountsList is null)
             {
                 return;
             }
@@ -42,7 +42,7 @@ namespace TwitterWebJob
                 content.Tweets
                        .Select(
                     tweetQueue => 
-                        WebActions.SendTweetAsync(tweetQueue, accountsDict, bearer)));
+                        WebActions.SendTweetAsync(tweetQueue, accountsList, bearer)));
         }
     }
 }

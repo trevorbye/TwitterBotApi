@@ -8,9 +8,9 @@ namespace TwitterBot.Models
     public class TweetQueueAccountReturnEntity
     {
         public IList<TweetQueue> Tweets { get; set; }
-        public IDictionary<string, TwitterAccount> Accounts { get; set; }
+        public IList<TwitterAccount> Accounts { get; set; }
 
-        public TweetQueueAccountReturnEntity(IList<TweetQueue> tweets, IDictionary<string, TwitterAccount> accounts)
+        public TweetQueueAccountReturnEntity(IList<TweetQueue> tweets, IList<TwitterAccount> accounts)
         {
             Tweets = tweets;
             Accounts = accounts;

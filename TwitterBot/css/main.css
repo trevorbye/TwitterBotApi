@@ -84,3 +84,8 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+.trash-hover:hover {
+    color: #a1a1a1;
+    cursor: pointer;
+}

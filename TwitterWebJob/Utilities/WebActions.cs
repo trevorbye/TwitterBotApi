@@ -21,9 +21,21 @@ namespace TwitterWebJob
             }
         }
 
+        static WebJobTwitterAccount getAccountFromListByHandle(string handle, IList<WebJobTwitterAccount> accountsList)
+        {
+            foreach (WebJobTwitterAccount acct in accountsList)
+            {
+                if (acct.TwitterHandle == handle)
+                {
+                    return acct;
+                }
+            }
+            return null;
+        }
+
         public static async Task SendTweetAsync(
             WebJobTweetQueue tweetQueue,
-            IDictionary<string, WebJobTwitterAccount> accountsDict,
+            IList<WebJobTwitterAccount> accountsList,
             string bearer)
         {
             bool isRetweet = false;
@@ -35,7 +47,7 @@ namespace TwitterWebJob
             var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             var version = WebUtility.UrlEncode("1.0");
-            var webJobTwitterAccount = accountsDict[tweetQueue.HandleUser];
+            var webJobTwitterAccount = getAccountFromListByHandle(tweetQueue.TwitterHandle, accountsList);
             var oauthToken = WebUtility.UrlEncode(webJobTwitterAccount.OauthToken);
             var oauthSecret = WebUtility.UrlEncode(webJobTwitterAccount.OauthSecret);
 

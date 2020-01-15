@@ -6,6 +6,6 @@ namespace TwitterWebJob
     {
         public IList<WebJobTweetQueue> Tweets { get; set; }
 
-        public IDictionary<string, WebJobTwitterAccount> Accounts { get; set; }
+        public IList<WebJobTwitterAccount> Accounts { get; set; }
     }
 }

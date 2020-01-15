@@ -119,9 +119,9 @@ namespace TwitterBot.Controllers
         {
             var user = User.GetUsername();
 
-            // find tweet by id, make sure claims user == tweet user
+            // find tweet by id, make sure claims user == tweet user OR handle user
             var tweetQueue = _databaseContext.TweetQueues.Find(id);
-            if (tweetQueue.TweetUser == user)
+            if (tweetQueue.TweetUser == user || tweetQueue.HandleUser == user)
             {
                 _databaseContext.TweetQueues.Remove(tweetQueue);
                 _databaseContext.SaveChanges();

@@ -30,15 +30,8 @@ namespace TwitterBot.Controllers
                                 .Where(table => table.ScheduledStatusTime <= timeNowUtc)
                                 .ToList();
 
-            var uniqueAccounts = new HashSet<string>();
-            tweetQueues.ForEach(queue => uniqueAccounts.Add(queue.HandleUser));
-
-            var accountDict =
-                uniqueAccounts.Select(handle => _databaseContext.TwitterAccounts.FirstOrDefault(x => x.HandleUser == handle))
-                              .ToDictionary(account => account.HandleUser, account => account);
-
-            var returnEntity = new TweetQueueAccountReturnEntity(tweetQueues, accountDict);
-
+            var accounts = _databaseContext.TwitterAccounts.ToList();
+            var returnEntity = new TweetQueueAccountReturnEntity(tweetQueues, accounts);
             return Ok(returnEntity);
         }
 

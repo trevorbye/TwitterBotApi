@@ -623,6 +623,31 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 });
         };
 
+        $scope.deleteTweet = function (tweetId, index) {
+
+            clientApplication.acquireTokenSilent([clientIdString])
+                .then(function (token) {
+                    var config = {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    };
+
+                    $http.delete("api/delete-tweet?id=" + tweetId, config).then(function (response) {
+                        $scope.tweetQueue.splice(index, 1);
+                        $scope.apply;
+                    });
+
+                }, function (error) {
+                    clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
+
+                    }, function (error) {
+
+                    });
+                });
+        };
+
         $scope.twitterSignIn = function () {
             clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
