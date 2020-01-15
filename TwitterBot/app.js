@@ -241,7 +241,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             }
         };
 
-        $scope.submitTweet = function () {
+        $scope.submitTweet = function() {
             $scope.error = false;
 
             // client side validation for null fields
@@ -252,11 +252,6 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 $scope.error = true;
                 $scope.errorMessage = "Tweet body cannot be empty.";
             } 
-
-            if ($scope.tweetSubmitObject.body.length > 280) {
-                $scope.error = true;
-                $scope.errorMessage = "Tweet body exceeds 280 character limit.";
-            }
 
             var date;
             if (!$scope.tweetSubmitObject.date || !$scope.tweetSubmitObject.time) {
