@@ -540,6 +540,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                     });
                 });
+
+            $('#delete').modal('hide');
         };
 
         $scope.editTweet = function (tweet, index) {
