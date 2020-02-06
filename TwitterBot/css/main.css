@@ -7,7 +7,7 @@
 }
 
 .home-icons {
-    color: #1DA1F2;
+    color: #1DA1F2 !important;
 }
 
     .home-icons:hover {
