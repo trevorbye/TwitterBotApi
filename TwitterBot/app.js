@@ -141,8 +141,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.queueActive = false;
         $rootScope.devActive = false;
 
-        $scope.acount = function () {
-            $location.path("/acount");
+        $scope.account = function () {
+            $location.path("/account");
         };
 
         $scope.tweet = function () {
