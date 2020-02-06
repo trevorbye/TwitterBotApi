@@ -14,7 +14,10 @@
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="nav navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a href="" class="nav-link" ng-class="{'active': manageActive}" ng-show="loggedIn" ng-click="manage()" ng-bind="manageText"></a>
+                    <a href="" class="nav-link" ng-class="{'active': accountActive}" ng-show="loggedIn" ng-click="account()" ng-bind="accountText"></a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link" ng-class="{'active': queueActive}" ng-show="loggedIn" ng-click="queue()" ng-bind="queueText"></a>
                 </li>
                 <li class="nav-item">
                     <a href="" class="nav-link" ng-class="{'active': tweetActive}" ng-show="loggedIn" ng-click="tweet()" ng-bind="tweetText"></a>

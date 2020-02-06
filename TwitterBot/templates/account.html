@@ -1,0 +1,96 @@
+﻿<div class="row">
+    <div class="col-md-12 mb-3">
+        <h2 class="mb-3">Add new account</h2>
+        <p class="mb-3">
+            Add a new Twitter account to allow other users to request to post to the account, pending your approval.
+            Nothing will be posted to this account without your consent, and you can remove the
+            account at any time either in this app or via your Twitter application permissions. If you are
+            currently logged into Twitter, that account will automatically be authenticated.
+            Log out of Twitter or sign into a different account to add a different handle.
+        </p>
+
+        <button class="btn btn-dark" ng-click="twitterSignIn()">
+            <i class="fab fa-twitter fa-md twitter"></i> Sign in with Twitter
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <h2 class="mb-3">Your Twitter accounts</h2>
+        <p class="mb-3">
+            These are your current Twitter accounts registered within this application. Click <b>Settings</b> next to
+            each handle to edit account settings. Configurable settings include enabling private account status, and account deletion.
+            If you designate an account as private, it only appears in your list of handles when composing a tweet.
+        </p>
+
+        <div ng-if="isLoadingHandles" class="d-flex p-3 align-items-center border border-common rounded">
+            <strong>Loading twitter accounts...</strong>
+            <div class="spinner-border text-primary ml-auto" role="status" aria-hidden="true"></div>
+        </div>
+        <div class="list-group">
+            <div ng-repeat="x in handles" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between align-items-center" ng-hide="x.settings">
+                    <h5 class="my-auto handles">{{x.handle}}</h5>
+                    <button class="btn btn-primary my-auto" ng-click="expandSettings($index)">
+                        Settings &nbsp; <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="settings-pane mt-3 card" ng-show="x.settings">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h5 class="my-auto handles">{{x.handle}}</h5>
+                        </div>
+                        <div class="d-flex w-100 justify-content-between mb-3">
+                            <p class="my-auto">Delete account</p>
+                            <button type="button" class="btn btn-danger my-auto" data-handle="{{x.handle}}" data-index="{{$index}}"
+                                    data-toggle="modal" data-target="#delete">
+                                Delete &nbsp; <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+
+                        <div class="d-flex w-100 justify-content-between mb-3">
+                            <p class="my-auto">
+                                Enable automatic <span class="twitter">@mention</span> retweets <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true"
+                                                                                                   title="When toggled on, any tweet mentioning <span class='twitter'>{{x.handle}}</span> will be added to your queue. Approving will automatically retweet the mention."></i>
+                            </p>
+                            <i class="fas fa-toggle-on fa-2x" ng-click="disableAutoTweets(x.handle, $index)" ng-show="x.retweet" style="vertical-align: middle;"></i>
+                            <i class="fas fa-toggle-off fa-2x" ng-click="enableAutoTweets(x.handle, $index)" ng-show="!x.retweet" style="vertical-align: middle;"></i>
+                        </div>
+
+                        <div class="d-flex w-100 justify-content-between mb-3">
+                            <p class="my-auto">Private account <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true" title="When toggled on, this account is <b>hidden</b> to other users within this application. This is commonly used for <i>personal</i> accounts."></i></p>
+                            <i class="fas fa-toggle-on fa-2x" ng-click="togglePrivateAccount(x.handle, $index, false)" ng-show="x.isPrivate" style="vertical-align: middle;"></i>
+                            <i class="fas fa-toggle-off fa-2x" ng-click="togglePrivateAccount(x.handle, $index, true)" ng-show="!x.isPrivate" style="vertical-align: middle;"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-end collapse">
+                            <button class="btn btn-secondary" ng-click="hideSettings($index)">
+                                Done &nbsp; <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="deleteAccount()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
