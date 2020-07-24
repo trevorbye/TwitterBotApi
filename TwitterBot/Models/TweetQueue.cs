@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,8 +32,33 @@ namespace TwitterBot.Models
         // this field is used to signal that this is a @mention tweet, and also holds the tweetId that a service would use to retweet this particular tweet.
         public long RetweetNum { get; set; }
 
+        // this field is used to store the blobIDs for images uploaded with the tweet. ':' is the delimiter
+        // yes, I know it's heresy to do this in SQL; we're doing it anyway
+        [Column(TypeName = "varchar")]
+        [MaxLength(150)]
+        public string BlockBlobIdsConcat { get; set; }
+
         public bool IsApprovedByHandle { get; set; }
         public bool IsPostedByWebJob { get; set; }
 
+        [NotMapped]
+        // this field primarily used as convenience to deserialize json from front end that contains image byte[]
+        public List<byte[]> ImageByteStreams { get; set; }
+
+        public List<string> GetBlockBlobIdsAsList()
+        {
+            return this.BlockBlobIdsConcat.Split(':').ToList();
+        }
+
+        public void SetBlockBlobIdsConcat(List<string> blobIds)
+        {
+            string concatIds = "";
+            foreach (var s in blobIds)
+            {
+                concatIds += s;
+                concatIds += ':';
+            }
+            BlockBlobIdsConcat = concatIds.TrimEnd(':');
+        }
     }
 }

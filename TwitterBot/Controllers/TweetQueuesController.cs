@@ -143,6 +143,16 @@ namespace TwitterBot.Controllers
             var account = _databaseContext.TwitterAccounts.FirstOrDefault(a => a.TwitterHandle == tweetQueue.TwitterHandle);
             tweetQueue.HandleUser = account.HandleUser;
 
+            // determine if tweet has attached images, if so, run validation, and upload to blob
+            if (tweetQueue.ImageByteStreams != null)
+            {
+                // TODO: validate image size, resolution, etc.
+
+                BlockBlobManager blobManager = new BlockBlobManager();
+                var blobIds = blobManager.UploadFileStreams(tweetQueue.ImageByteStreams);
+                tweetQueue.SetBlockBlobIdsConcat(blobIds);
+            }
+
             // populate last few object fields
             tweetQueue.CreatedTime = DateTime.UtcNow;
             tweetQueue.IsApprovedByHandle = false;
