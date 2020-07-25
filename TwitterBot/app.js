@@ -199,7 +199,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.devActive = true;
     });
 
-    twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope, $routeParams) {
+    twitterBot.controller("tweets", function ($rootScope, $http, $location, $scope, $routeParams, $window) {
         // set navbar active classes
         $rootScope.tweetActive = true;
         $rootScope.accountActive = false;
@@ -373,6 +373,11 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
         $scope.clearImages = function () {
             $scope.imageFileList = [];
+        };
+
+        $scope.openImageInNewWindow = function (file) {
+            var newTab = $window.open("about:blank", "_blank");
+            newTab.document.write("<img src='" + file + "' />");
         };
 
         $scope.cancelTweet = function (tweetId, index) {
