@@ -22,28 +22,28 @@ namespace TwitterBot.POCOS
 
         public List<string> UploadFileStreams(List<string> base64Strings)
         {
-            var contentStreams = new List<byte[]>();
+            var blobIds = new List<string>();
             foreach (var base64 in base64Strings)
             {
-                var stripped = base64.Split(',')[1];
-                contentStreams.Add(Convert.FromBase64String(stripped));
-            }
+                var chunked = base64.Split(',');
 
-            var blobIds = new List<string>();
-            foreach (var contentStream in contentStreams)
-            {
                 // create new blob
                 var newBlobId = CreateNewEmptyBlockBlob();
                 blobIds.Add(newBlobId);
                 BlockBlobClient blockBlob = Container.GetBlockBlobClient(newBlobId);
 
+                // add metadata
+                IDictionary<string, string> metadata = new Dictionary<string, string>();
+                metadata.Add("mimeString", chunked[0] + ",");
+                
                 // create single block
                 var blockList = new List<string>();
                 blockList.Add(CreateRandId());
-                blockBlob.StageBlock(blockList[0], new MemoryStream(contentStream));
+                blockBlob.StageBlock(blockList[0], new MemoryStream(Convert.FromBase64String(chunked[1])));
 
                 // commit block
                 blockBlob.CommitBlockList(blockList);
+                blockBlob.SetMetadata(metadata);
             }
             return blobIds;
         }
@@ -54,6 +54,8 @@ namespace TwitterBot.POCOS
             foreach (var blobId in blobIds)
             {
                 BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+                var properties = blockBlob.GetProperties();
+
                 var blockStream = new MemoryStream();
                 blockBlob.DownloadTo(blockStream);
                 fileStreams.Add(blockStream.ToArray());

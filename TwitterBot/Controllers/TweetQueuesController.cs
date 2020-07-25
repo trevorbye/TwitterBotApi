@@ -153,6 +153,7 @@ namespace TwitterBot.Controllers
                 try
                 {
                     blobIds = blobManager.UploadFileStreams(tweetQueue.ImageBase64Strings);
+                    blobManager.DownloadFileStreams(blobIds);
                 }
                 catch (Exception e)
                 {
