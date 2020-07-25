@@ -32,7 +32,7 @@ namespace TwitterBot.POCOS
                 blobIds.Add(newBlobId);
                 BlockBlobClient blockBlob = Container.GetBlockBlobClient(newBlobId);
 
-                // add metadata
+                // create metadata
                 IDictionary<string, string> metadata = new Dictionary<string, string>();
                 metadata.Add("mimeString", chunked[0] + ",");
                 
@@ -42,8 +42,7 @@ namespace TwitterBot.POCOS
                 blockBlob.StageBlock(blockList[0], new MemoryStream(Convert.FromBase64String(chunked[1])));
 
                 // commit block
-                blockBlob.CommitBlockList(blockList);
-                blockBlob.SetMetadata(metadata);
+                blockBlob.CommitBlockList(blockList, null, metadata);
             }
             return blobIds;
         }
