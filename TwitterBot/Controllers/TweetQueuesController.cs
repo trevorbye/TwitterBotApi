@@ -144,12 +144,20 @@ namespace TwitterBot.Controllers
             tweetQueue.HandleUser = account.HandleUser;
 
             // determine if tweet has attached images, if so, run validation, and upload to blob
-            if (tweetQueue.ImageByteStreams != null)
+            if (tweetQueue.ImageBase64Strings != null)
             {
-                // TODO: validate image size, resolution, etc.
+                // TODO: validate image size, resolution, etc. Return bad request if not supported format
 
                 BlockBlobManager blobManager = new BlockBlobManager();
-                var blobIds = blobManager.UploadFileStreams(tweetQueue.ImageByteStreams);
+                List<string> blobIds = null;
+                try
+                {
+                    blobIds = blobManager.UploadFileStreams(tweetQueue.ImageBase64Strings);
+                }
+                catch (Exception e)
+                {
+                    return BadRequest("image-upload-error");
+                }
                 tweetQueue.SetBlockBlobIdsConcat(blobIds);
             }
 

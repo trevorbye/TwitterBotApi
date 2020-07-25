@@ -43,7 +43,7 @@ namespace TwitterBot.Models
 
         [NotMapped]
         // this field primarily used as convenience to deserialize json from front end that contains image byte[]
-        public List<byte[]> ImageByteStreams { get; set; }
+        public List<string> ImageBase64Strings { get; set; }
 
         public List<string> GetBlockBlobIdsAsList()
         {

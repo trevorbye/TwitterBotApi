@@ -10,7 +10,7 @@ namespace TwitterBot.POCOS
     public class BlockBlobManager
     {
         // get from env variable in prod
-        private readonly string _key = "";
+        private readonly string _key = "DefaultEndpointsProtocol=https;AccountName=tweetmedia;AccountKey=o1ANwoz6LTAzZ7b99AxRNYIDyw0orF133ycOpzMwGDi79TletTpu1B4McWj1XiyXzjfZH4nQ9Xd+/iww9P6jsQ==;EndpointSuffix=core.windows.net";
         public BlobServiceClient Client { get; set; }
         public BlobContainerClient Container { get; set; }
 
@@ -20,8 +20,15 @@ namespace TwitterBot.POCOS
             Container = Client.GetBlobContainerClient("media");
         }
 
-        public List<string> UploadFileStreams(List<byte[]> contentStreams)
+        public List<string> UploadFileStreams(List<string> base64Strings)
         {
+            var contentStreams = new List<byte[]>();
+            foreach (var base64 in base64Strings)
+            {
+                var stripped = base64.Split(',')[1];
+                contentStreams.Add(Convert.FromBase64String(stripped));
+            }
+
             var blobIds = new List<string>();
             foreach (var contentStream in contentStreams)
             {

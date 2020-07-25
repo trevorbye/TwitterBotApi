@@ -43,8 +43,26 @@
             <input id="tweet-time" type="time" class="form-control" ng-model="tweetSubmitObject.time" />
         </div>
 
+        <div class="input-group mb-3" ng-hide="imageFileList.length >= 3">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="images-file-input"
+                       select-ng-files ng-model="imageFileList" accept=".png, .PNG, .jpg, .jpeg" multiple>
+                <label class="custom-file-label" for="images-file-input">Add images</label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-warning" ng-click="clearImages()" ng-show="imageFileList.length > 0">Clear images</button>
+        </div>
+
+        <div ng-repeat="file in imageFileList" class="mb-3">
+            <img ng-src="{{file}}" alt="" class="img-fluid" />
+        </div>
+
         <button type="button" ng-disabled="!isValidTweet"
-                class="btn btn-success mb-3 tweet" ng-click="submitTweet()">Create Tweet</button>
+                class="btn btn-success mb-3 tweet" ng-click="submitTweet()">
+            Create Tweet
+        </button>
 
         <div class="alert alert-danger" role="alert" ng-show="error">
             <strong>Oops!</strong> {{errorMessage}}

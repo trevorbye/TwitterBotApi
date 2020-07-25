@@ -4,6 +4,31 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
 (function () {
     var twitterBot = angular.module('twitterBot', ['ngRoute']);
+
+    // directive for binding file input element to ng-model
+    twitterBot.directive("selectNgFiles", function () {
+        return {
+            require: "ngModel",
+            link: function postLink(scope, elem, attrs, ngModel) {
+                elem.on("change", function (e) {
+                    var files = elem[0].files;
+                    var modifiedFileList = [];
+                    
+                    Array.from(files).forEach(function (file) {
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            modifiedFileList.push(e.target.result);
+                            ngModel.$setViewValue(modifiedFileList);
+                        }
+                        reader.readAsDataURL(file);
+                    });
+                    console.log(modifiedFileList);
+                    elem.val(null);
+                })
+            }
+        }
+    });
+
     twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
         var routeResolve = {
             "auth": function ($window, $q) {
@@ -14,8 +39,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         defer.resolve();
                         return defer.promise;
                     }, function (error) {
-                        //$window.location.href = "http://localhost:52937/";
-                        $window.location.href = "https://mstwitterbot.azurewebsites.net/";
+                        $window.location.href = "http://localhost:52937/";
+                        //$window.location.href = "https://mstwitterbot.azurewebsites.net/";
                     });  
             }
         };
@@ -171,6 +196,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $scope.error = false;
         $scope.errorMessage = "";
         $scope.isValidTweet = false;
+        $scope.imageFileList = [];
 
         clientApplication.acquireTokenSilent([clientIdString])
             .then(function (token) {
@@ -288,7 +314,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                 var tweetQueueObject = {
                     "TwitterHandle": $scope.tweetSubmitObject.handle,
                     "ScheduledStatusTime": date,
-                    "StatusBody": $scope.tweetSubmitObject.body
+                    "StatusBody": $scope.tweetSubmitObject.body,
+                    "ImageBase64Strings": $scope.imageFileList
                 };
 
                 clientApplication.acquireTokenSilent([clientIdString])
@@ -324,6 +351,10 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         });
                     });
             }
+        };
+
+        $scope.clearImages = function () {
+            $scope.imageFileList = [];
         };
 
         $scope.cancelTweet = function (tweetId, index) {
