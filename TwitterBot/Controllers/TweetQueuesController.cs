@@ -153,7 +153,7 @@ namespace TwitterBot.Controllers
                 try
                 {
                     blobIds = blobManager.UploadFileStreams(tweetQueue.ImageBase64Strings);
-                    blobManager.DownloadFileStreams(blobIds);
+                    //blobManager.DownloadFileStreams(blobIds);
                 }
                 catch (Exception e)
                 {
@@ -170,7 +170,7 @@ namespace TwitterBot.Controllers
             _databaseContext.TweetQueues.Add(tweetQueue);
             _databaseContext.SaveChanges();
 
-            NotificationService.SendNotificationToHandle(tweetQueue);
+            //NotificationService.SendNotificationToHandle(tweetQueue);
             tweetQueue.HandleUser = null;
             return Ok(tweetQueue);
         }

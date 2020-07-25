@@ -29,6 +29,23 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         }
     });
 
+    twitterBot.directive('croppedImage', function () {
+        return {
+            restrict: "E",
+            replace: true,
+            template: "<div class='center-cropped'></div>",
+            link: function (scope, element, attrs) {
+                var width = attrs.width;
+                var height = attrs.height;
+                element.css('width', width + "px");
+                element.css('height', height + "px");
+                element.css('backgroundPosition', 'center center');
+                element.css('backgroundRepeat', 'no-repeat');
+                element.css('backgroundImage', "url('" + attrs.src + "')");
+            }
+        }
+    });
+
     twitterBot.config(function ($routeProvider, $httpProvider, $locationProvider) {
         var routeResolve = {
             "auth": function ($window, $q) {
@@ -333,7 +350,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                             "TwitterHandle": $scope.tweetSubmitObject.handle,
                             "StatusBody": $scope.tweetSubmitObject.body,
                             "IsApprovedByHandle": false,
-                            "IsPostedByWebJob": false
+                            "IsPostedByWebJob": false,
+                            "ImageBase64Strings": $scope.imageFileList
                         };
                         $scope.tweetQueue.unshift(tweetObject);
                         $scope.tweetSubmitObject = {};
