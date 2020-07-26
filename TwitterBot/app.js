@@ -353,13 +353,25 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                             "IsPostedByWebJob": false,
                             "ImageBase64Strings": $scope.imageFileList
                         };
-                        $scope.tweetQueue.unshift(tweetObject);
-                        $scope.tweetSubmitObject = {};
-                        $scope.apply;
+                        
 
                         $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
+                            $scope.tweetQueue.unshift(tweetObject);
+                            $scope.tweetSubmitObject = {};
+                            $scope.imageFileList = [];
+                            $scope.apply;
+
                             $scope.tweetQueue[0].TweetUser = response.data.TweetUser;
                             $scope.tweetQueue[0].Id = response.data.Id;
+                        }, function (response) {
+                                $scope.error = true;
+                                if (response.status == 404) {
+                                    $scope.errorMessage = "One of your images exceeds the size limit for requests within this application (22mb). Additionally, individual images must be <=5mb in size.";
+                                } else {
+                                    $scope.errorMessage = response.data;
+                                }
+                                console.log(response);
+                                $scope.apply;
                         });
                     }, function (error) {
                         clientApplication.acquireTokenPopup([clientIdString]).then(function (token) {
@@ -381,6 +393,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         };
 
         $scope.cancelTweet = function (tweetId, index) {
+            $scope.tweetQueue.splice(index, 1);
 
             clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
@@ -392,8 +405,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                     };
 
                     $http.delete("api/delete-tweet?id=" + tweetId, config).then(function (response) {
-                        $scope.tweetQueue.splice(index, 1);
-                        $scope.apply;
+ 
                     });
 
                 }, function (error) {

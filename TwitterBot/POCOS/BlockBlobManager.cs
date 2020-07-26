@@ -4,6 +4,7 @@ using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Web.Configuration;
 
 namespace TwitterBot.POCOS
 {
@@ -78,10 +79,31 @@ namespace TwitterBot.POCOS
             return base64Strings;
         }
 
-        public void DeleteBlobById(string blobId)
+        public List<string> ValidationErrors(List<string> base64Strings)
         {
-            BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
-            blockBlob.Delete(DeleteSnapshotsOption.IncludeSnapshots);
+            var errors = new List<string>();
+            if (base64Strings.Count > 4)
+            {
+                errors.Add("Only 4 images are allows per tweet.");
+            }
+            foreach (var base64 in base64Strings)
+            {
+                var totalBytes = Convert.FromBase64String(base64.Split(',')[1]).Length;
+                if (totalBytes > 5000000)
+                {
+                    errors.Add("At least one image exceeds the max image size of 5mb.");
+                    return errors;
+                }
+            }
+            return errors;
+        }
+
+        public void DeleteBlobsFromIds(List<string> blobIds)
+        {
+            foreach (var blobId in blobIds) {
+                BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+                blockBlob.Delete(DeleteSnapshotsOption.IncludeSnapshots);
+            }
         }
 
         public string CreateRandId()

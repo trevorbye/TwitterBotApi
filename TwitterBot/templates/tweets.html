@@ -43,7 +43,7 @@
             <input id="tweet-time" type="time" class="form-control" ng-model="tweetSubmitObject.time" />
         </div>
 
-        <div class="input-group mb-3" ng-hide="imageFileList.length >= 3">
+        <div class="input-group mb-3" ng-hide="imageFileList.length >= 4">
             <div class="custom-file">
                 <input type="file" class="custom-file-input" id="images-file-input"
                        select-ng-files ng-model="imageFileList" accept=".png, .PNG, .jpg, .jpeg" multiple>
@@ -61,7 +61,7 @@
             </li>
         </ul>
 
-        <button type="button" ng-disabled="!isValidTweet || imageFileList.length > 3"
+        <button type="button" ng-disabled="!isValidTweet || imageFileList.length > 4"
                 class="btn btn-success mb-3 tweet" ng-click="submitTweet()">
             Create Tweet
         </button>
@@ -69,8 +69,8 @@
         <div class="alert alert-danger" role="alert" ng-show="error">
             <strong>Oops!</strong> {{errorMessage}}
         </div>
-        <div class="alert alert-danger" role="alert" ng-show="imageFileList.length > 3">
-            <strong>Oops!</strong> You exceeded the maximum of <strong>3</strong> images.
+        <div class="alert alert-danger" role="alert" ng-show="imageFileList.length > 4">
+            <strong>Oops!</strong> You exceeded the maximum of <strong>4</strong> images.
         </div>
     </div>
 

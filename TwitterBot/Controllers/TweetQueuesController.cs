@@ -7,6 +7,7 @@ using TwitterBot.Models;
 using TwitterBot.POCOS;
 using System.Security.Claims;
 using TwitterBot.Extensions;
+using System.Web.Http.Results;
 
 namespace TwitterBot.Controllers
 {
@@ -143,6 +144,12 @@ namespace TwitterBot.Controllers
             var tweetQueue = _databaseContext.TweetQueues.Find(id);
             if (tweetQueue.TweetUser == user || tweetQueue.HandleUser == user)
             {
+                if (tweetQueue.BlockBlobIdsConcat != null)
+                {
+                    BlockBlobManager manager = new BlockBlobManager();
+                    manager.DeleteBlobsFromIds(tweetQueue.GetBlockBlobIdsAsList());
+                }
+                
                 _databaseContext.TweetQueues.Remove(tweetQueue);
                 _databaseContext.SaveChanges();
                 return Ok();
@@ -166,9 +173,19 @@ namespace TwitterBot.Controllers
             // determine if tweet has attached images, if so, run validation, and upload to blob
             if (tweetQueue.ImageBase64Strings != null)
             {
-                // TODO: validate image size, resolution, etc. Return bad request if not supported format
-
                 BlockBlobManager blobManager = new BlockBlobManager();
+                // validate image, return bad request if not supported format
+                var errors = blobManager.ValidationErrors(tweetQueue.ImageBase64Strings);
+                if (errors.Count > 0)
+                {
+                    var message = "";
+                    foreach (var error in errors)
+                    {
+                        message += (error + " ");
+                    }
+                    return Content(System.Net.HttpStatusCode.BadRequest, message);
+                }
+
                 List<string> blobIds = null;
                 try
                 {
@@ -176,7 +193,7 @@ namespace TwitterBot.Controllers
                 }
                 catch (Exception e)
                 {
-                    return BadRequest("image-upload-error");
+                    return BadRequest("Error uploading image(s) to storage.");
                 }
                 tweetQueue.SetBlockBlobIdsConcat(blobIds);
             }
