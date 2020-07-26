@@ -21,6 +21,16 @@ namespace TwitterBot.Controllers
             var user = User.GetUsername();
             IList<TweetQueue> tweets = _databaseContext.TweetQueues.Where(table => table.TweetUser == user)
                 .OrderByDescending(x => x.CreatedTime).ToList();
+
+            // get images from blob storage
+            BlockBlobManager manager = new BlockBlobManager();
+            foreach (var tweet in tweets)
+            {
+                if (tweet.BlockBlobIdsConcat != null)
+                {
+                    tweet.ImageBase64Strings = manager.DownloadBase64FileStrings(tweet.GetBlockBlobIdsAsList());
+                }
+            }
             return Ok(tweets);
         }
 
@@ -30,6 +40,16 @@ namespace TwitterBot.Controllers
             var user = User.GetUsername();
             IList<TweetQueue> tweets = _databaseContext.TweetQueues.Where(table => table.HandleUser == user)
                 .OrderByDescending(x => x.CreatedTime).ToList();
+
+            // get images from blob storage
+            BlockBlobManager manager = new BlockBlobManager();
+            foreach (var tweet in tweets)
+            {
+                if (tweet.BlockBlobIdsConcat != null)
+                {
+                    tweet.ImageBase64Strings = manager.DownloadBase64FileStrings(tweet.GetBlockBlobIdsAsList());
+                }
+            }
             return Ok(tweets);
         }
 
@@ -153,7 +173,6 @@ namespace TwitterBot.Controllers
                 try
                 {
                     blobIds = blobManager.UploadFileStreams(tweetQueue.ImageBase64Strings);
-                    //blobManager.DownloadFileStreams(blobIds);
                 }
                 catch (Exception e)
                 {

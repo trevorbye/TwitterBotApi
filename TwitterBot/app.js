@@ -597,7 +597,6 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         $rootScope.queueActive = false;
         $rootScope.devActive = false;
 
-        $scope.isLoadingHandles = true;
         $scope.isLoadingQueue = true;
         $scope.handles = [];
         $scope.tweetQueue = [];
@@ -610,24 +609,6 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         'Authorization': 'Bearer ' + token
                     }
                 };
-
-                $http.get("api/get-user-twitter-accounts", config).then(function (response) {
-                    var accounts = response.data;
-                    var uiList = [];
-                    for (let index = 0; index < accounts.length; ++index) {
-                        var account = accounts[index];
-                        var uiHandleObject = {
-                            handle: account.TwitterHandle,
-                            settings: false,
-                            retweet: account.IsAutoRetweetEnabled,
-                            isPrivate: account.IsPrivateAccount
-                        };
-                        uiList.push(uiHandleObject);
-                    }
-
-                    $scope.handles = uiList;
-                    $scope.isLoadingHandles = false;
-                }, _ => $scope.isLoadingHandles = false);
 
                 $http.get("api/get-utc-now").then(function (utcRes) {
                     $http.get("api/get-handles-tweet-queue", config).then(function (response) {
@@ -674,6 +655,11 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
                 });
             });
+
+        $scope.openImageInNewWindow = function (file) {
+            var newTab = $window.open("about:blank", "_blank");
+            newTab.document.write("<img src='" + file + "' />");
+        };
 
         $scope.editTweet = function (tweet, index) {
 

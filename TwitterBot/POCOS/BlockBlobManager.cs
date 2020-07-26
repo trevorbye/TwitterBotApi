@@ -58,11 +58,30 @@ namespace TwitterBot.POCOS
                 var blockStream = new MemoryStream();
                 blockBlob.DownloadTo(blockStream);
                 fileStreams.Add(blockStream.ToArray());
-
-                // delete blob after fetching byte stream
-                blockBlob.Delete(DeleteSnapshotsOption.IncludeSnapshots);
             }
             return fileStreams;
+        }
+
+        public List<string> DownloadBase64FileStrings(List<string> blobIds)
+        {
+            var base64Strings = new List<string>();
+            foreach (var blobId in blobIds)
+            {
+                BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+                var properties = blockBlob.GetProperties();
+                string mimeString = properties.Value.Metadata["mimeString"];
+                
+                var blockStream = new MemoryStream();
+                blockBlob.DownloadTo(blockStream);
+                base64Strings.Add(mimeString + Convert.ToBase64String(blockStream.ToArray()));
+            }
+            return base64Strings;
+        }
+
+        public void DeleteBlobById(string blobId)
+        {
+            BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+            blockBlob.Delete(DeleteSnapshotsOption.IncludeSnapshots);
         }
 
         public string CreateRandId()
