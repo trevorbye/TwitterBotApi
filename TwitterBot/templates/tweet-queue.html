@@ -21,8 +21,8 @@
                 <p class="mb-1 wrapped">{{tweet.StatusBody}}</p>
 
                 <ul class="list-group list-group-horizontal">
-                    <li class="list-group-item flex-fill mr-2 thumbnail-item" ng-repeat="file in tweet.ImageBase64Strings" ng-click="openImageInNewWindow(file)">
-                        <img cropped-image ng-src="{{file}}" alt="thumbnail" class="img-thumbnail" />
+                    <li class="list-group-item w-25 mr-2 thumbnail-item" ng-repeat="file in tweet.ImageBase64Strings" ng-click="openImageInNewWindow(file)">
+                        <img cropped-image ng-src="{{file}}" alt="thumbnail" class="img-thumbnail img-fluid w-100" />
                     </li>
                 </ul>
 
