@@ -302,6 +302,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
 
         $scope.submitTweet = function() {
             $scope.error = false;
+            var dummyTweetPending = { "Id": null };
+            $scope.tweetQueue.unshift(dummyTweetPending);
 
             // client side validation for null fields
             if ($scope.tweetSubmitObject.handle === null) {
@@ -356,15 +358,16 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         
 
                         $http.post("api/post-new-tweet", tweetQueueObject, config).then(function (response) {
-                            $scope.tweetQueue.unshift(tweetObject);
+                            tweetObject.TweetUser = response.data.TweetUser;
+                            tweetObject.Id = response.data.Id;
+
+                            $scope.tweetQueue[0] = tweetObject;
                             $scope.tweetSubmitObject = {};
                             $scope.imageFileList = [];
                             $scope.apply;
-
-                            $scope.tweetQueue[0].TweetUser = response.data.TweetUser;
-                            $scope.tweetQueue[0].Id = response.data.Id;
                         }, function (response) {
                                 $scope.error = true;
+                                $scope.tweetQueue.shift();
                                 if (response.status == 404) {
                                     $scope.errorMessage = "One of your images exceeds the size limit for requests within this application (22mb). Additionally, individual images must be <=5mb in size.";
                                 } else {
@@ -673,6 +676,10 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
             newTab.document.write("<img src='" + file + "' />");
         };
 
+        $scope.removeImage = function (parentIndex, index) {
+            $scope.tweetQueue[parentIndex].ImageBase64Strings.splice(index, 1);
+        };
+
         $scope.editTweet = function (tweet, index) {
 
             if (tweet.StatusBody.length > 280) {
@@ -750,6 +757,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
         };
 
         $scope.deleteTweet = function (tweetId, index) {
+            $scope.tweetQueue.splice(index, 1);
 
             clientApplication.acquireTokenSilent([clientIdString])
                 .then(function (token) {
@@ -761,8 +769,7 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                     };
 
                     $http.delete("api/delete-tweet?id=" + tweetId, config).then(function (response) {
-                        $scope.tweetQueue.splice(index, 1);
-                        $scope.apply;
+ 
                     });
 
                 }, function (error) {

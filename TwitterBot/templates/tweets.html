@@ -88,10 +88,17 @@
         </div>
         <div class="list-group scroll-group">
             <div ng-repeat="tweet in tweetQueue" class="list-group-item list-group-item-action flex-column align-items-start">
+
+                <div class="d-flex p-1 align-items-center" ng-show="tweet.Id == null">
+                    <strong>Validating tweet...</strong>
+                    <div class="spinner-border text-success ml-auto" role="status" aria-hidden="true"></div>
+                </div>
+
                 <div class="d-flex w-100 justify-content-between align-items-center">
                     <h5 class="mb-1 handles">{{tweet.TwitterHandle}}</h5>
                     <small>{{tweet.CreatedTime}}</small>
                 </div>
+
                 <p class="mb-1 wrapped">{{tweet.StatusBody}}</p>
 
                 <ul class="list-group list-group-horizontal">
@@ -100,7 +107,7 @@
                     </li>
                 </ul>
 
-                <div class="d-flex w-100 justify-content-between mt-2">
+                <div class="d-flex w-100 justify-content-between mt-2" ng-hide="tweet.Id == null">
                     <span>
                         <i class="far fa-clock fa-sm" style="vertical-align: middle;"></i>
                         <small class="my-auto">{{tweet.ScheduledStatusTime}}</small>
@@ -112,7 +119,7 @@
                         <i ng-show="tweet.IsApprovedByHandle" class="fas fa-check fa-lg" style="vertical-align: middle;"></i>
                     </span>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2" ng-hide="tweet.Id == null">
                     <i ng-show="tweet.IsPostedByWebJob" class="fab fa-twitter-square fa-lg twitter"></i>
                 </div>
             </div>

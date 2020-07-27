@@ -22,6 +22,7 @@
 
                 <ul class="list-group list-group-horizontal">
                     <li class="list-group-item w-25 mr-2 thumbnail-item" ng-repeat="file in tweet.ImageBase64Strings" ng-click="openImageInNewWindow(file)">
+                        <i class="fas fa-trash-alt trash-hover float-right mb-2" ng-click="removeImage($parent.$index, $index)" ng-show="tweet.EditPaneExpanded"></i>
                         <img cropped-image ng-src="{{file}}" alt="thumbnail" class="img-thumbnail img-fluid w-100" />
                     </li>
                 </ul>

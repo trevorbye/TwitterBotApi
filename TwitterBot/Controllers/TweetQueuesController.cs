@@ -81,9 +81,37 @@ namespace TwitterBot.Controllers
                 return BadRequest();
             }
 
+            // if these aren't equal, the editor deleted at least one image
+            if (model.BlockBlobIdsConcat != null)
+            {
+                if (model.ImageBase64Strings.Count != tweetQueue.GetBlockBlobIdsAsList().Count)
+                {
+                    BlockBlobManager manager = new BlockBlobManager();
+                    manager.DeleteBlobsFromIds(tweetQueue.GetBlockBlobIdsAsList());
+
+                    if (model.ImageBase64Strings.Count > 0)
+                    {
+                        List<string> blobIds = null;
+                        try
+                        {
+                            blobIds = manager.UploadFileStreams(model.ImageBase64Strings);
+                        }
+                        catch (Exception e)
+                        {
+                            return BadRequest("Error uploading image(s) to storage.");
+                        }
+                        tweetQueue.SetBlockBlobIdsConcat(blobIds);
+                    }
+                    else
+                    {
+                        tweetQueue.BlockBlobIdsConcat = null;
+                    }
+                }
+            }
+
             tweetQueue.StatusBody = model.StatusBody;
             _databaseContext.SaveChanges();
-            NotificationService.SendEditNotif(tweetQueue, originalStatus);
+            //NotificationService.SendEditNotif(tweetQueue, originalStatus);
         
             return Ok();
         }

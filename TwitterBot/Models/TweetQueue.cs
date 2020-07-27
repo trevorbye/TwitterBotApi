@@ -42,7 +42,7 @@ namespace TwitterBot.Models
         public bool IsPostedByWebJob { get; set; }
 
         [NotMapped]
-        // this field primarily used as convenience to deserialize json from front end that contains image byte[]
+        // this field primarily used as convenience to deserialize json from front end that contains image base64 strings
         public List<string> ImageBase64Strings { get; set; }
 
         public List<string> GetBlockBlobIdsAsList()
