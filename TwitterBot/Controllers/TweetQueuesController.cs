@@ -199,7 +199,7 @@ namespace TwitterBot.Controllers
             tweetQueue.HandleUser = account.HandleUser;
 
             // determine if tweet has attached images, if so, run validation, and upload to blob
-            if (tweetQueue.ImageBase64Strings != null)
+            if (tweetQueue.ImageBase64Strings.Count > 0)
             {
                 BlockBlobManager blobManager = new BlockBlobManager();
                 // validate image, return bad request if not supported format
