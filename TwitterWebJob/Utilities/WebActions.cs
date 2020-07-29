@@ -66,10 +66,8 @@ namespace TwitterWebJob
                 var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
                 var version = WebUtility.UrlEncode("1.0");
-                var encodedData = WebUtility.UrlEncode(base64);
-
+                
                 var paramString =
-                    "media_data=" + encodedData + "&" +
                     "oauth_consumer_key=" + oauthConsumerKey + "&" +
                     "oauth_nonce=" + oauthNonce + "&" +
                     "oauth_signature_method=" + sigMethod + "&" +
@@ -91,9 +89,11 @@ namespace TwitterWebJob
                     "oauth_token=" + "\"" + oauthToken + "\"" + ", " +
                     "oauth_version=" + "\"" + version + "\"";
 
-                var body = new Dictionary<string, string>();
-                body.Add("media_data", base64);
+                
                 var client = new HttpClient();
+                var formContent = new MultipartFormDataContent();
+                byte[] imgStream = Convert.FromBase64String(base64);
+                formContent.Add(new ByteArrayContent(imgStream), "media");
 
                 var request = new HttpRequestMessage
                 {
@@ -102,10 +102,9 @@ namespace TwitterWebJob
                     Headers =
                     {
                         { HttpRequestHeader.Authorization.ToString(), authString },
-                        { "Content-Transfer-Encoding", "base64" },
-                        { HttpRequestHeader.ContentType.ToString(), "application/x-www-form-urlencoded" }
+                        { HttpRequestHeader.ContentType.ToString(), "multipart/form-data" }
                     },
-                    Content = new FormUrlEncodedContent(body)
+                    Content = formContent
                 };
                 var response = client.SendAsync(request).Result;
                 JObject res = JsonConvert.DeserializeObject<JObject>(response.Content.ReadAsStringAsync().Result);
