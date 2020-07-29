@@ -111,7 +111,7 @@ namespace TwitterBot.Controllers
 
             tweetQueue.StatusBody = model.StatusBody;
             _databaseContext.SaveChanges();
-            //NotificationService.SendEditNotif(tweetQueue, originalStatus);
+            NotificationService.SendEditNotif(tweetQueue, originalStatus);
         
             return Ok();
         }
@@ -234,7 +234,7 @@ namespace TwitterBot.Controllers
             _databaseContext.TweetQueues.Add(tweetQueue);
             _databaseContext.SaveChanges();
 
-            //NotificationService.SendNotificationToHandle(tweetQueue);
+            NotificationService.SendNotificationToHandle(tweetQueue);
             tweetQueue.HandleUser = null;
             return Ok(tweetQueue);
         }

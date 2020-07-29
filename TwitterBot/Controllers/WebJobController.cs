@@ -100,5 +100,24 @@ namespace TwitterBot.Controllers
 
             return Ok(0);
         }
+
+        [HttpGet, Route("api/get-image-streams")]
+        public IHttpActionResult GetImageStreams(int tweetQueueId)
+        {
+            var authToken = Request.Headers.Authorization.Parameter;
+            if (authToken != BearerToken || authToken == null)
+            {
+                return Unauthorized();
+            }
+
+            var tweetQueue = _databaseContext.TweetQueues.Find(tweetQueueId);
+            if (tweetQueue is null)
+            {
+                return BadRequest();
+            }
+
+            BlockBlobManager manager = new BlockBlobManager();
+            return Ok(manager.DownloadBase64FileStringsNoMime(tweetQueue.GetBlockBlobIdsAsList()));
+        }
     }
 }

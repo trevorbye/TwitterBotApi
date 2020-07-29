@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace TwitterWebJob
 {
@@ -19,6 +21,8 @@ namespace TwitterWebJob
         public string StatusBody { get; set; }
 
         public long RetweetNum { get; set; }
+
+        public string BlockBlobIdsConcat { get; set; }
 
         public bool IsApprovedByHandle { get; set; }
 

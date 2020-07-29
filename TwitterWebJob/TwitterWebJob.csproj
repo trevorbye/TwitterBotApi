@@ -109,6 +109,7 @@
     <Compile Include="Functions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Test.cs" />
     <Compile Include="Utilities\WebJobTweetQueue.cs" />
     <Compile Include="Utilities\WebJobTweetQueueAccountReturnEntity.cs" />
     <Compile Include="Utilities\WebJobTwitterAccount.cs" />

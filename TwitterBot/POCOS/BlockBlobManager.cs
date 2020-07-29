@@ -79,6 +79,19 @@ namespace TwitterBot.POCOS
             return base64Strings;
         }
 
+        public List<string> DownloadBase64FileStringsNoMime(List<string> blobIds)
+        {
+            var base64Strings = new List<string>();
+            foreach (var blobId in blobIds)
+            {
+                BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+                var blockStream = new MemoryStream();
+                blockBlob.DownloadTo(blockStream);
+                base64Strings.Add(Convert.ToBase64String(blockStream.ToArray()));
+            }
+            return base64Strings;
+        }
+
         public List<string> ValidationErrors(List<string> base64Strings)
         {
             var errors = new List<string>();

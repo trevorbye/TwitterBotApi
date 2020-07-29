@@ -56,8 +56,8 @@ var clientApplication = new Msal.UserAgentApplication(clientIdString, authority)
                         defer.resolve();
                         return defer.promise;
                     }, function (error) {
-                        $window.location.href = "http://localhost:52937/";
-                        //$window.location.href = "https://mstwitterbot.azurewebsites.net/";
+                        //window.location.href = "http://localhost:52937/";
+                        $window.location.href = "https://mstwitterbot.azurewebsites.net/";
                     });  
             }
         };
