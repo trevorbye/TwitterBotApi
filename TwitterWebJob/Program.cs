@@ -6,7 +6,7 @@ namespace TwitterWebJob
 {
     class Program
     {
-        static async Task Main0()
+        static async Task Main()
         {
             var config = new JobHostConfiguration();
             if (config.IsDevelopment)

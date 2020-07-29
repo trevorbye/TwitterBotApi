@@ -14,7 +14,7 @@ namespace TwitterWebJob
 {
     class Test
     {
-        public static void Main(string[] args)
+        public static void Main0(string[] args)
         {
             var mediaIds = GetMediaIds();
             var mediaIdString = "";
@@ -77,6 +77,7 @@ namespace TwitterWebJob
             };
 
             var response = client.SendAsync(request).Result;
+            bool success = response.IsSuccessStatusCode;
             var bp = 0;
         }
 
