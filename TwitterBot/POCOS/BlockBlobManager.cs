@@ -101,11 +101,17 @@ namespace TwitterBot.POCOS
             }
             foreach (var base64 in base64Strings)
             {
-                var totalBytes = Convert.FromBase64String(base64.Split(',')[1]).Length;
+                var segments = base64.Split(',');
+                var totalBytes = Convert.FromBase64String(segments[1]).Length;
                 if (totalBytes > 5000000)
                 {
                     errors.Add("At least one image exceeds the max image size of 5mb.");
-                    return errors;
+                }
+
+                var mimeType = segments[0].Split(':')[1].Split(';')[0];
+                if (mimeType != "image/png" && mimeType != "image/jpeg")
+                {
+                    errors.Add("Only image/png and image/jpeg are supported.");
                 }
             }
             return errors;
