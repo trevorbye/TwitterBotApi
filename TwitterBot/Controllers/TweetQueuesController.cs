@@ -8,6 +8,7 @@ using TwitterBot.POCOS;
 using System.Security.Claims;
 using TwitterBot.Extensions;
 using System.Web.Http.Results;
+using System.Threading.Tasks;
 
 namespace TwitterBot.Controllers
 {
@@ -17,7 +18,7 @@ namespace TwitterBot.Controllers
         readonly TwitterBotContext _databaseContext = new TwitterBotContext();
 
         [HttpGet, Route("api/get-user-tweet-queue")]
-        public IHttpActionResult GetUserTweetQueue()
+        public async Task<IHttpActionResult> GetUserTweetQueue()
         {
             var user = User.GetUsername();
             IList<TweetQueue> tweets = _databaseContext.TweetQueues.Where(table => table.TweetUser == user)
@@ -25,18 +26,30 @@ namespace TwitterBot.Controllers
 
             // get images from blob storage
             BlockBlobManager manager = new BlockBlobManager();
+            var asyncTasks = new List<Task<List<string>>>();
+            var idxReplaceList = new List<int>();
+            int idx = 0;
             foreach (var tweet in tweets)
             {
                 if (tweet.BlockBlobIdsConcat != null)
                 {
-                    tweet.ImageBase64Strings = manager.DownloadBase64FileStrings(tweet.GetBlockBlobIdsAsList());
+                    idxReplaceList.Add(idx);
+                    asyncTasks.Add(manager.GetTweetImagesAsync(tweet));
                 }
+                idx += 1;
             }
+            var taskResult = await Task.WhenAll(asyncTasks);
+            var listOfImageLists = new Queue<List<string>>(taskResult);
+            foreach (var i in idxReplaceList)
+            {
+                tweets[i].ImageBase64Strings = listOfImageLists.Dequeue();
+            }
+            
             return Ok(tweets);
         }
 
         [HttpGet, Route("api/get-handles-tweet-queue")]
-        public IHttpActionResult GetHandlesTweetQueue()
+        public async Task<IHttpActionResult> GetHandlesTweetQueue()
         {
             var user = User.GetUsername();
             IList<TweetQueue> tweets = _databaseContext.TweetQueues.Where(table => table.HandleUser == user)
@@ -44,13 +57,25 @@ namespace TwitterBot.Controllers
 
             // get images from blob storage
             BlockBlobManager manager = new BlockBlobManager();
+            var asyncTasks = new List<Task<List<string>>>();
+            var idxReplaceList = new List<int>();
+            int idx = 0;
             foreach (var tweet in tweets)
             {
                 if (tweet.BlockBlobIdsConcat != null)
                 {
-                    tweet.ImageBase64Strings = manager.DownloadBase64FileStrings(tweet.GetBlockBlobIdsAsList());
+                    idxReplaceList.Add(idx);
+                    asyncTasks.Add(manager.GetTweetImagesAsync(tweet));
                 }
+                idx += 1;
             }
+            var taskResult = await Task.WhenAll(asyncTasks);
+            var listOfImageLists = new Queue<List<string>>(taskResult);
+            foreach (var i in idxReplaceList)
+            {
+                tweets[i].ImageBase64Strings = listOfImageLists.Dequeue();
+            }
+
             return Ok(tweets);
         }
 

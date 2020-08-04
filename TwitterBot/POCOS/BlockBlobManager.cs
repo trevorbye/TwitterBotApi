@@ -4,7 +4,9 @@ using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Web.Configuration;
+using TwitterBot.Models;
 
 namespace TwitterBot.POCOS
 {
@@ -77,6 +79,33 @@ namespace TwitterBot.POCOS
                 base64Strings.Add(mimeString + Convert.ToBase64String(blockStream.ToArray()));
             }
             return base64Strings;
+        }
+
+        public async Task<List<string>> GetTweetImagesAsync(TweetQueue tweetQueue)
+        {
+            return await this.DownloadBase64FileStringsAsync(tweetQueue.GetBlockBlobIdsAsList());
+        }
+
+        public async Task<List<string>> DownloadBase64FileStringsAsync(List<string> blobIds)
+        {
+            var asyncTasks = new List<Task<string>>();
+            foreach (string blobId in blobIds)
+            {
+                asyncTasks.Add(DownloadBlobBase64Async(blobId));
+            }
+            var result = await Task.WhenAll(asyncTasks);
+            return new List<string>(result);
+        }
+
+        public async Task<string> DownloadBlobBase64Async(string blobId)
+        {
+            BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+            var properties = await blockBlob.GetPropertiesAsync();
+            string mimeString = properties.Value.Metadata["mimeString"];
+
+            var blockStream = new MemoryStream();
+            await blockBlob.DownloadToAsync(blockStream);
+            return mimeString + Convert.ToBase64String(blockStream.ToArray());
         }
 
         public List<string> DownloadBase64FileStringsNoMime(List<string> blobIds)
