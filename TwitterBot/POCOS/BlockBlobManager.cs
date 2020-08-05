@@ -154,6 +154,12 @@ namespace TwitterBot.POCOS
             }
         }
 
+        public void DeleteBlobFromId(string blobId)
+        {
+            BlockBlobClient blockBlob = Container.GetBlockBlobClient(blobId);
+            blockBlob.Delete(DeleteSnapshotsOption.IncludeSnapshots);
+        }
+
         public string CreateRandId()
         {
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

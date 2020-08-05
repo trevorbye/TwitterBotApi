@@ -141,6 +141,26 @@ namespace TwitterBot.Controllers
             return Ok();
         }
 
+        [HttpDelete, Route("api/delete-tweet-image")]
+        public IHttpActionResult ReactAppDeleteImage(int tweetId, int imageIdx)
+        {
+            var user = User.GetUsername();
+            var tweetQueue = _databaseContext.TweetQueues.Find(tweetId);
+            if (tweetQueue.HandleUser != user)
+            {
+                return BadRequest();
+            }
+            var blobIds = tweetQueue.GetBlockBlobIdsAsList();
+            BlockBlobManager manager = new BlockBlobManager();
+            manager.DeleteBlobFromId(blobIds[imageIdx]);
+
+            blobIds.RemoveAt(imageIdx);
+            tweetQueue.SetBlockBlobIdsConcat(blobIds);
+            _databaseContext.SaveChanges();
+            
+            return Ok(tweetQueue.BlockBlobIdsConcat);
+        }
+
         [HttpGet, Route("api/approve-or-cancel")]
         public IHttpActionResult ApproveOrCancelTweet(int approveById, int cancelById)
         {
