@@ -141,6 +141,25 @@ namespace TwitterBot.Controllers
             return Ok();
         }
 
+        [HttpPost, Route("api/edit-tweet-attributes")]
+        public IHttpActionResult ReactAppEditTweetByHandleOwner(int tweetId, string body)
+        {
+            var user = User.GetUsername();
+
+            var tweetQueue = _databaseContext.TweetQueues.Find(tweetId);
+            var originalStatus = tweetQueue.StatusBody;
+            if (tweetQueue.HandleUser != user)
+            {
+                return BadRequest();
+            }
+
+            tweetQueue.StatusBody = body;
+            _databaseContext.SaveChanges();
+            NotificationService.SendEditNotif(tweetQueue, originalStatus);
+
+            return Ok();
+        }
+
         [HttpDelete, Route("api/delete-tweet-image")]
         public IHttpActionResult ReactAppDeleteImage(int tweetId, int imageIdx)
         {
