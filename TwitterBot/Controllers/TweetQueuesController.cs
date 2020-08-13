@@ -142,18 +142,19 @@ namespace TwitterBot.Controllers
         }
 
         [HttpPost, Route("api/edit-tweet-attributes")]
-        public IHttpActionResult ReactAppEditTweetByHandleOwner(int tweetId, string body)
+        public IHttpActionResult ReactAppEditTweetByHandleOwner(TweetQueue tweet)
         {
             var user = User.GetUsername();
 
-            var tweetQueue = _databaseContext.TweetQueues.Find(tweetId);
+            var tweetQueue = _databaseContext.TweetQueues.Find(tweet.Id);
             var originalStatus = tweetQueue.StatusBody;
             if (tweetQueue.HandleUser != user)
             {
                 return BadRequest();
             }
 
-            tweetQueue.StatusBody = body;
+            tweetQueue.StatusBody = tweet.StatusBody;
+            tweetQueue.ScheduledStatusTime = tweet.ScheduledStatusTime;
             _databaseContext.SaveChanges();
             NotificationService.SendEditNotif(tweetQueue, originalStatus);
 
