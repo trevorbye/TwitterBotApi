@@ -52,6 +52,12 @@ namespace TwitterBot.Models
 
         public void SetBlockBlobIdsConcat(List<string> blobIds)
         {
+            if (blobIds.Count == 0)
+            {
+                BlockBlobIdsConcat = null;
+                return;
+            }
+
             string concatIds = "";
             foreach (var s in blobIds)
             {
