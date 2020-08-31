@@ -16,7 +16,7 @@ namespace TwitterBot.Controllers
         private readonly TwitterBotContext _databaseContext = new TwitterBotContext();
         static readonly string ConsumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
         static readonly string Secret = Environment.GetEnvironmentVariable("SECRET");
-        const string Callback = "https://mstwitterbot.azurewebsites.net/add-account-redirect";
+        const string Callback = "https://mstwitterapp.azurewebsites.net/add-account-redirect";
 
         [HttpGet, Route("api/twitter-auth-token")]
         public async Task<IHttpActionResult> GetTwitterOauthString()
