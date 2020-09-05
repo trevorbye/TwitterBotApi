@@ -90,7 +90,7 @@ namespace TwitterWebJob
             return uri;
         }
 
-        public static void Main0(string[] args)
+        public static void Main1(string[] args)
         {
             string ConsumerKey = "E4BdX6Shn32xHNX4ydpW1Kj0b";
             string Secret = "g76QnyQSi0khjuJcZ4TPcBbsKISHmh2YDhWqcylZ8CYRtiz7zf";
