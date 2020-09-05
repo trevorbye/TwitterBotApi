@@ -209,31 +209,42 @@ namespace TwitterWebJob
 
             var client = new HttpClient();
             Uri uri;
+            HttpRequestMessage request;
             if (isRetweet)
             {
                 uri = new Uri(baseUrl);
+                request = new HttpRequestMessage
+                {
+                    RequestUri = uri,
+                    Method = HttpMethod.Post,
+                    Headers =
+                    {
+                        { HttpRequestHeader.Authorization.ToString(), authString }
+                    }
+                };
             }
             else
             {
                 if (hasImages) 
                 {
-                    uri = new Uri($"{baseUrl}?media_ids={encodedMediaIds}&status={status}");
+                    uri = new Uri($"{baseUrl}?media_ids={encodedMediaIds}");
                 }
                 else
                 {
-                    uri = new Uri($"{baseUrl}?status={status}");
+                    uri = new Uri($"{baseUrl}");
                 }
-            }
 
-            var request = new HttpRequestMessage
-            {
-                RequestUri = uri,
-                Method = HttpMethod.Post,
-                Headers =
+                request = new HttpRequestMessage
                 {
-                    { HttpRequestHeader.Authorization.ToString(), authString }
-                }
-            };
+                    RequestUri = uri,
+                    Method = HttpMethod.Post,
+                    Headers =
+                    {
+                        { HttpRequestHeader.Authorization.ToString(), authString }
+                    },
+                    Content = new StringContent($"status={status}", Encoding.UTF8, "application/x-www-form-urlencoded")
+                };
+            }
             
             var response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
