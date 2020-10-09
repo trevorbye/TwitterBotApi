@@ -201,6 +201,23 @@ namespace TwitterBot.Controllers
             }
         }
 
+        [HttpGet, Route("api/toggle-public-schedule")]
+        public IHttpActionResult ToggleMakeSchedulePublic(string handle, bool isPublic)
+        {
+            var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            if (!ownsHandle)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                account.IsTweetSchedulePublic = isPublic;
+                _databaseContext.SaveChanges();
+
+                return Ok();
+            }
+        }
+
         [HttpDelete, Route("api/delete-twitter-account")]
         public IHttpActionResult DeleteTwitterAccount(string handle)
         {

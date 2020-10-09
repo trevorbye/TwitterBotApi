@@ -33,6 +33,8 @@ namespace TwitterBot.Models
 
         public bool IsPrivateAccount { get; set; }
 
+        public bool IsTweetSchedulePublic { get; set; }
+
         public TwitterAccount(string handle, long twitterUserId, string handleUser, string oauthToken, string  oauthSecret, bool enableRetweets)
         {
             TwitterHandle = handle;
