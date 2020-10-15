@@ -255,7 +255,8 @@ namespace TwitterBot.Controllers
                     {
                         account.TwitterHandle,
                         account.IsAutoRetweetEnabled,
-                        account.IsPrivateAccount
+                        account.IsPrivateAccount,
+                        account.IsTweetSchedulePublic
                     }));
         }
     }

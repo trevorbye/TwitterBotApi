@@ -94,6 +94,34 @@ namespace TwitterBot.Controllers
             return Ok(handles);
         }
 
+        [HttpGet, Route("api/get-public-schedule")]
+        public IHttpActionResult GetPublicTweetSchedule(string handle)
+        {
+            var account = _databaseContext.TwitterAccounts.FirstOrDefault(table => table.TwitterHandle == handle);
+            if (!account.IsTweetSchedulePublic)
+            {
+                var emptyQueue = new List<TweetQueue>();
+                return Ok(emptyQueue);
+            }
+            else
+            {
+                return Ok(
+                _databaseContext.TweetQueues
+                    .Where(table => table.TwitterHandle == handle)
+                    .Select(tweet => new
+                    {
+                        tweet.TwitterHandle,
+                        tweet.ScheduledStatusTime,
+                        tweet.IsApprovedByHandle,
+                        tweet.IsPostedByWebJob,
+                        tweet.Id
+                    })
+                    
+                    .ToList()
+                );
+            }
+        }
+
         [HttpPost, Route("api/edit-tweet-body")]
         public IHttpActionResult EditTweetByHandleOwner(TweetQueue model)
         {
