@@ -8,6 +8,8 @@ namespace TwitterWebJob
     {
         public int Id { get; set; }
 
+        public int TweetId { get; set; }
+
         public string TwitterHandle { get; set; }
 
         public string TweetUser { get; set; }
@@ -27,5 +29,9 @@ namespace TwitterWebJob
         public bool IsApprovedByHandle { get; set; }
 
         public bool IsPostedByWebJob { get; set; }
+
+        public string Poll { get; set; }
+
+        public bool hasPoll { get; set; }
     }
 }

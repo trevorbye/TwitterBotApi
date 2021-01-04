@@ -163,6 +163,7 @@ namespace TwitterBot.Controllers
             }
 
             tweetQueue.StatusBody = model.StatusBody;
+            tweetQueue.Poll = model.Poll;
             _databaseContext.SaveChanges();
             NotificationService.SendEditNotif(tweetQueue, originalStatus);
         
@@ -183,8 +184,24 @@ namespace TwitterBot.Controllers
 
             tweetQueue.StatusBody = tweet.StatusBody;
             tweetQueue.ScheduledStatusTime = tweet.ScheduledStatusTime;
+            tweetQueue.Poll = tweet.Poll;
             _databaseContext.SaveChanges();
             NotificationService.SendEditNotif(tweetQueue, originalStatus);
+
+            return Ok();
+        }
+
+        [HttpPost, Route("api/update-tweet-id")]
+        public IHttpActionResult WebJobUpdateTweetIdAfterPost(TweetQueue tweet)
+        {
+
+            var tweetQueue = _databaseContext.TweetQueues.Find(tweet.Id);
+
+
+            tweetQueue.TweetId = tweet.TweetId;
+            tweetQueue.IsPostedByWebJob = true;
+            tweetQueue.IsApprovedByHandle = true; 
+            _databaseContext.SaveChanges();
 
             return Ok();
         }
@@ -330,6 +347,36 @@ namespace TwitterBot.Controllers
             NotificationService.SendNotificationToHandle(tweetQueue);
             tweetQueue.HandleUser = null;
             return Ok(tweetQueue);
+        }
+
+        /// <summary>
+        /// Add tweet id to existing internal tweet. Must have been posted to get tweet id from twitter. 
+        /// </summary>
+        /// <param name="id">Internal Id</param>
+        /// <returns></returns>
+        [HttpGet, Route("api/tweet")]
+        public async Task<IHttpActionResult> TweetById(int id)
+        {
+
+            // must auth to update tweet id
+            var user = User.GetUsername();
+            if (user == "")
+            {
+                return BadRequest();
+            }
+
+            // find internal tweet
+            var tweet = _databaseContext.TweetQueues.Find(id);
+
+            // get images from blob storage
+            BlockBlobManager manager = new BlockBlobManager();
+
+            if (tweet.BlockBlobIdsConcat != null)
+            {
+                tweet.ImageBase64Strings = await manager.GetTweetImagesAsync(tweet);
+            }
+
+            return Ok(tweet);
         }
     }
 }

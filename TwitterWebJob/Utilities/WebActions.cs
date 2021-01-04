@@ -10,11 +10,14 @@ using Newtonsoft.Json.Linq;
 
 namespace TwitterWebJob
 {
-    class WebActions
+    public class WebActions
     {
         static readonly string ConsumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
         static readonly string Secret = Environment.GetEnvironmentVariable("SECRET");
         static readonly string Token = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
+
+        // http://localhost:52937/
+        static readonly string BaseUri = Environment.GetEnvironmentVariable("TWITTERBOT_API_URI");
 
         public static string ShaHash(string value, string signingKey)
         {
@@ -48,7 +51,7 @@ namespace TwitterWebJob
             var apiClient = new HttpClient();
             var apiRequest = new HttpRequestMessage
             {
-                RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/get-image-streams?tweetQueueId={tweetQueue.Id}"),
+                RequestUri = new Uri($"{BaseUri}api/get-image-streams?tweetQueueId={tweetQueue.Id}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -112,12 +115,25 @@ namespace TwitterWebJob
             }
             return mediaIds;
         }
+        // create poll object on Twitter - return poll ID
+        public static long BuildPollId(string oauthConsumerKey,
+            string oauthToken,
+            string oauthUserSecret)
+        {
 
-        public static async Task SendTweetAsync(
+            throw new NotImplementedException();
+        }
+
+        // Return new Tweet Id
+        public static async Task<string> SendTweetAsync(
             WebJobTweetQueue tweetQueue,
             IList<WebJobTwitterAccount> accountsList,
             string bearer)
+
         {
+            // if poll, skip
+            if (tweetQueue.Poll.Length>0) return "";
+
             bool isRetweet = false;
             bool hasImages = false;
             if (tweetQueue.BlockBlobIdsConcat != null)
@@ -245,22 +261,46 @@ namespace TwitterWebJob
                     Content = new StringContent($"status={status}", Encoding.UTF8, "application/x-www-form-urlencoded")
                 };
             }
-            
-            var response = await client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                var serviceRequest = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/webjob-mark-complete?tweetQueueId={tweetQueue.Id}"),
-                    Method = HttpMethod.Get,
-                    Headers =
-                    {
-                        { HttpRequestHeader.Authorization.ToString(), bearer }
-                    }
-                };
 
-                await client.SendAsync(serviceRequest);
+            // send tweet
+            using (HttpResponseMessage response = client.SendAsync(request).Result)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+
+                    // set tweet id into database
+                    using (HttpContent content = response.Content)
+                    {
+                        var result = content.ReadAsStringAsync().Result;
+
+                        // TBD - replace dynamic with class to deserialize response to
+                        dynamic json = JsonConvert.DeserializeObject(result);
+                        var tweetId = json.id.Value.ToString();
+
+                        // update database with tweet id
+                        var serviceRequest = new HttpRequestMessage
+                        {
+                            RequestUri = new Uri($"{BaseUri}api/webjob-mark-complete?tweetQueueId={tweetQueue.Id}&twitterIdForTweet={tweetId}"),
+                            Method = HttpMethod.Get,
+                            Headers =
+                            {
+                                { HttpRequestHeader.Authorization.ToString(), bearer }
+                            }
+                        };
+
+                        var updateTweetIdResponse = await client.SendAsync(serviceRequest);
+                        if (updateTweetIdResponse.IsSuccessStatusCode)
+                        {
+
+                            return tweetId;
+                        }
+                    }
+                }
+
             }
+
+            return null;
+
         }
     }
 }

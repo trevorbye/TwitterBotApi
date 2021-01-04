@@ -3,6 +3,7 @@ using Owin;
 using System.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
+using Microsoft.Owin.Cors;
 
 namespace TwitterBot
 {
@@ -10,6 +11,10 @@ namespace TwitterBot
     {
         public void ConfigureAuth(IAppBuilder app)
         {
+#if DEBUG
+            app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+#endif
+
             var tvps = new TokenValidationParameters
             {
                 ValidAudience = ConfigurationManager.AppSettings["ida:Audience"],

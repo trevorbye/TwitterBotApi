@@ -10,6 +10,8 @@ namespace TwitterBot.Models
     {
         public int Id { get; set; }
 
+        public string TweetId { get; set; }
+
         [Column(TypeName = "varchar")]
         [MaxLength(40)]
         public string TwitterHandle { get; set; }
@@ -37,6 +39,14 @@ namespace TwitterBot.Models
         [Column(TypeName = "varchar")]
         [MaxLength(150)]
         public string BlockBlobIdsConcat { get; set; }
+
+        // this field is used to store the poll content. ':' is the delimiter
+        [Column(TypeName = "varchar")]
+        [MaxLength(150)]
+        public string Poll { get; set; }
+        public string PollId { get; set; }
+        public int PollDurationMinutes { get; set; }
+        
 
         public bool IsApprovedByHandle { get; set; }
         public bool IsPostedByWebJob { get; set; }

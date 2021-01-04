@@ -12,6 +12,8 @@ namespace TwitterBot.Controllers
         readonly TwitterBotContext _databaseContext = new TwitterBotContext();
         static readonly string BearerToken = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
 
+        // any value means it is a Dev Environment
+        static readonly string AspNetDevEnvironment = Environment.GetEnvironmentVariable("AspNetDevEnvironment");
 
         [HttpGet, Route("api/webjob-fetch-queue")]
         public IHttpActionResult FetchTweetQueueAndAccounts()
@@ -81,10 +83,10 @@ namespace TwitterBot.Controllers
         }
 
         [HttpGet, Route("api/webjob-mark-complete")]
-        public IHttpActionResult MarkAsWebJobComplete(int tweetQueueId)
+        public IHttpActionResult MarkAsWebJobComplete(int tweetQueueId, string twitterIdForTweet)
         {
             var authToken = Request.Headers.Authorization.Parameter;
-            if (authToken != BearerToken || authToken == null)
+            if (AspNetDevEnvironment==null && (authToken != BearerToken || authToken == null))
             {
                 return Unauthorized();
             }
@@ -96,6 +98,7 @@ namespace TwitterBot.Controllers
             }
 
             tweetQueue.IsPostedByWebJob = true;
+            tweetQueue.TweetId = twitterIdForTweet;
             _databaseContext.SaveChanges();
 
             return Ok(0);
