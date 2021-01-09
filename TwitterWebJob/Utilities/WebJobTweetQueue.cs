@@ -8,6 +8,8 @@ namespace TwitterWebJob
     {
         public int Id { get; set; }
 
+        public string TweetId { get; set; }
+
         public string TwitterHandle { get; set; }
 
         public string TweetUser { get; set; }

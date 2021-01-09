@@ -81,7 +81,7 @@ namespace TwitterBot.Controllers
         }
 
         [HttpGet, Route("api/webjob-mark-complete")]
-        public IHttpActionResult MarkAsWebJobComplete(int tweetQueueId)
+        public IHttpActionResult MarkAsWebJobComplete(int tweetQueueId, string twitterIdForTweet)
         {
             var authToken = Request.Headers.Authorization.Parameter;
             if (authToken != BearerToken || authToken == null)
@@ -96,6 +96,7 @@ namespace TwitterBot.Controllers
             }
 
             tweetQueue.IsPostedByWebJob = true;
+            tweetQueue.TweetId = twitterIdForTweet;
             _databaseContext.SaveChanges();
 
             return Ok(0);
