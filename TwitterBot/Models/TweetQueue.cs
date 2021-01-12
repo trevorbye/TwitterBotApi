@@ -8,7 +8,11 @@ namespace TwitterBot.Models
 {
     public class TweetQueue
     {
+        // internal id
         public int Id { get; set; }
+
+        // twitter's tweet Id
+        public string TweetId { get; set; }
 
         [Column(TypeName = "varchar")]
         [MaxLength(40)]

@@ -10,11 +10,14 @@ using Newtonsoft.Json.Linq;
 
 namespace TwitterWebJob
 {
-    class WebActions
+    public class WebActions
     {
         static readonly string ConsumerKey = Environment.GetEnvironmentVariable("CONSUMER_KEY");
         static readonly string Secret = Environment.GetEnvironmentVariable("SECRET");
         static readonly string Token = Environment.GetEnvironmentVariable("WEBJOB_AUTH_KEY");
+
+        // http://localhost:52937/
+        static readonly string WebApiBaseUri = Environment.GetEnvironmentVariable("TWITTERBOT_API_URI").Length>0 ? Environment.GetEnvironmentVariable("TWITTERBOT_API_URI") : "https://mstwitterbot.azurewebsites.net/";
 
         public static string ShaHash(string value, string signingKey)
         {
@@ -66,7 +69,7 @@ namespace TwitterWebJob
                 var sigMethod = WebUtility.UrlEncode("HMAC-SHA1");
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
                 var version = WebUtility.UrlEncode("1.0");
-                
+
                 var paramString =
                     "oauth_consumer_key=" + oauthConsumerKey + "&" +
                     "oauth_nonce=" + oauthNonce + "&" +
@@ -89,7 +92,7 @@ namespace TwitterWebJob
                     "oauth_token=" + "\"" + oauthToken + "\"" + ", " +
                     "oauth_version=" + "\"" + version + "\"";
 
-                
+
                 var client = new HttpClient();
                 var formContent = new MultipartFormDataContent();
                 byte[] imgStream = Convert.FromBase64String(base64);
@@ -113,18 +116,19 @@ namespace TwitterWebJob
             return mediaIds;
         }
 
-        public static async Task SendTweetAsync(
+        public static async Task<string> SendTweetAsync(
             WebJobTweetQueue tweetQueue,
             IList<WebJobTwitterAccount> accountsList,
             string bearer)
         {
             bool isRetweet = false;
             bool hasImages = false;
+
             if (tweetQueue.BlockBlobIdsConcat != null)
             {
                 hasImages = true;
             }
-            if (tweetQueue.RetweetNum != 0) 
+            if (tweetQueue.RetweetNum != 0)
             {
                 isRetweet = true;
             }
@@ -153,7 +157,7 @@ namespace TwitterWebJob
                     "oauth_token=" + oauthToken + "&" +
                     "oauth_version=" + version;
             }
-            else 
+            else
             {
                 status = Uri.EscapeDataString(tweetQueue.StatusBody);
                 baseUrl = "https://api.twitter.com/1.1/statuses/update.json";
@@ -192,7 +196,7 @@ namespace TwitterWebJob
                         "status=" + status;
                 }
             }
-            
+
             var signatureBaseString =
                 $"POST&{WebUtility.UrlEncode(baseUrl)}&{WebUtility.UrlEncode(paramString)}";
             var signingKey = $"{Secret}&{oauthSecret}";
@@ -225,7 +229,7 @@ namespace TwitterWebJob
             }
             else
             {
-                if (hasImages) 
+                if (hasImages)
                 {
                     uri = new Uri($"{baseUrl}?media_ids={encodedMediaIds}");
                 }
@@ -245,22 +249,46 @@ namespace TwitterWebJob
                     Content = new StringContent($"status={status}", Encoding.UTF8, "application/x-www-form-urlencoded")
                 };
             }
-            
-            var response = await client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                var serviceRequest = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"https://mstwitterbot.azurewebsites.net/api/webjob-mark-complete?tweetQueueId={tweetQueue.Id}"),
-                    Method = HttpMethod.Get,
-                    Headers =
-                    {
-                        { HttpRequestHeader.Authorization.ToString(), bearer }
-                    }
-                };
 
-                await client.SendAsync(serviceRequest);
+            // send tweet
+            using (HttpResponseMessage response = client.SendAsync(request).Result)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+
+                    // set tweet id into database
+                    using (HttpContent content = response.Content)
+                    {
+                        var result = content.ReadAsStringAsync().Result;
+
+                        // TBD - replace dynamic with class to deserialize response to
+                        dynamic json = JsonConvert.DeserializeObject(result);
+                        var tweetId = json.id.Value.ToString();
+
+                        // update database with tweet id
+                        var serviceRequest = new HttpRequestMessage
+                        {
+                            RequestUri = new Uri($"{WebApiBaseUri}api/webjob-mark-complete?tweetQueueId={tweetQueue.Id}&twitterIdForTweet={tweetId}"),
+                            Method = HttpMethod.Get,
+                            Headers =
+                            {
+                                { HttpRequestHeader.Authorization.ToString(), bearer }
+                            }
+                        };
+
+                        var updateTweetIdResponse = await client.SendAsync(serviceRequest);
+                        if (updateTweetIdResponse.IsSuccessStatusCode)
+                        {
+
+                            return tweetId;
+                        }
+                    }
+                }
+
             }
+
+            return null;
+
         }
     }
 }
