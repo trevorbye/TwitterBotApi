@@ -226,6 +226,7 @@
     <Compile Include="Controllers\AdminManagersController.cs" />
     <Compile Include="Controllers\AppController.cs" />
     <Compile Include="Controllers\TweetQueuesController.cs" />
+    <Compile Include="Controllers\TweetTemplateController.cs" />
     <Compile Include="Controllers\UtilController.cs" />
     <Compile Include="Controllers\WebJobController.cs" />
     <Compile Include="Extensions\ClaimsIdentityExtensions.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Models\AdminManager.cs" />
     <Compile Include="Models\TweetQueue.cs" />
     <Compile Include="Models\TweetQueueAccountReturnEntity.cs" />
+    <Compile Include="Models\TweetTemplate.cs" />
     <Compile Include="Models\TwitterAccount.cs" />
     <Compile Include="Models\TwitterBotContext.cs" />
     <Compile Include="POCOS\BlockBlobManager.cs" />

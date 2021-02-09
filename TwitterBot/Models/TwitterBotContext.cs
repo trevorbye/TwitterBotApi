@@ -25,5 +25,7 @@ namespace TwitterBot.Models
 
         public DbSet<TwitterAccount> TwitterAccounts { get; set; }
 
+        public DbSet<TweetTemplate> TweetTemplates { get; set; }
+
     }
 }
