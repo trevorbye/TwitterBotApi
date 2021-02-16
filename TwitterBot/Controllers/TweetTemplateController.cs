@@ -24,5 +24,29 @@ namespace TwitterBot.Controllers
             var list = _databaseContext.TweetTemplates.ToList();
             return Ok(list);
         }
+
+
+
+        [HttpPost, Route("api/tweet-template")]
+        public IHttpActionResult PostNewTemplate(TweetTemplate tweetTemplate)
+        {
+            var user = User.GetUsername();
+            tweetTemplate.TweetUser = user;
+
+            // find twitter account user
+            var account = _databaseContext.TwitterAccounts.FirstOrDefault(a => a.TwitterHandle == tweetTemplate.TwitterHandle);
+            tweetTemplate.HandleUser = account.HandleUser;
+
+            // populate last few object fields
+            tweetTemplate.Created = DateTime.UtcNow;
+            tweetTemplate.Modified = DateTime.UtcNow;
+
+            _databaseContext.TweetTemplates.Add(tweetTemplate);
+            _databaseContext.SaveChanges();
+
+            tweetTemplate.HandleUser = null;
+            return Ok(tweetTemplate);
+        }
     }
 }
+
