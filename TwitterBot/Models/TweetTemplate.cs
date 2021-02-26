@@ -10,9 +10,11 @@ namespace TwitterBot.Models
     {
         public int Id { get; set; }
 
+        [Required]
         [StringLength(255)]
         public string TwitterHandle { get; set; }
 
+        [Required]
         [StringLength(255)]
         public string TweetUser { get; set; }
 
@@ -22,13 +24,13 @@ namespace TwitterBot.Models
 
         public int? ChangedThresholdPercentage { get; set; }
 
-        public int? CodeChanges { get; set; }
+        public bool CodeChanges { get; set; }
 
-        public int? External { get; set; }
+        public bool External { get; set; }
 
-        public int? NewFiles { get; set; }
+        public bool NewFiles { get; set; }
 
-        public int? IgnoreMetadataOnly { get; set; }
+        public bool IgnoreMetadataOnly { get; set; }
 
         [StringLength(255)]
         public string Title { get; set; }
@@ -37,10 +39,10 @@ namespace TwitterBot.Models
         public string Channel { get; set; }
 
         [StringLength(255)]
-        public string MsServer { get; set; }
+        public string SearchType { get; set; }
 
         [StringLength(255)]
-        public string GlobPath { get; set; }
+        public string SearchBy { get; set; }
 
         [StringLength(255)]
         public string ForceNotifyTag { get; set; }
@@ -52,7 +54,7 @@ namespace TwitterBot.Models
         public string Rss { get; set; }
 
         [StringLength(1000)]
-        public string Attachments { get; set; }
+        public string TemplateText { get; set; }
 
         public DateTime? Created { get; set; }
 
