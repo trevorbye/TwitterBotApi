@@ -225,6 +225,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminManagersController.cs" />
     <Compile Include="Controllers\AppController.cs" />
+    <Compile Include="Controllers\TweetAutomationController.cs" />
     <Compile Include="Controllers\TweetQueuesController.cs" />
     <Compile Include="Controllers\TweetTemplateController.cs" />
     <Compile Include="Controllers\UtilController.cs" />

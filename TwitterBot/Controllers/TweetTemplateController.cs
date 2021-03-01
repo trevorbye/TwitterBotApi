@@ -16,77 +16,12 @@ using System.Net.Http;
 
 namespace TwitterBot.Controllers
 {
+    [Authorize]
     public class TweetTemplateController : ApiController
     {
-        static readonly string BobbyReedBearerToken = Environment.GetEnvironmentVariable("BOBBYREED_CLIENT_KEY");
-        static readonly string AzureFunctionValidateTweetTextKey = Environment.GetEnvironmentVariable("AZUREFUNTION_VALIDATETWEET_KEY");
         readonly TwitterBotContext _databaseContext = new TwitterBotContext();
 
-        // get all - For Bobby Reed
-        [HttpGet, Route("api/br-tweet-templates")]
-        public IHttpActionResult BrGetAllTemplates()
-        {
-            var authToken = Request.Headers.Authorization.Parameter;
-            if (authToken != BobbyReedBearerToken || authToken is null)
-            {
-                return Unauthorized();
-            }
-
-            var list = _databaseContext.TweetTemplates.ToList();
-            return Ok(list);
-        }
-
-        // insert 1 tweet - For Bobby Reed
-        [HttpPost, Route("api/br-tweet-template")]
-        public async Task<IHttpActionResult> BrPostNewTemplate(TweetQueue tweet)
-        {
-            var authToken = Request.Headers.Authorization.Parameter;
-            if (authToken != BobbyReedBearerToken || authToken is null)
-            {
-                return Unauthorized();
-            }
-
-            // validate tweet body
-            var bearer = $"Bearer {AzureFunctionValidateTweetTextKey}";
-            var apiClient = new HttpClient();
-            var apiRequest = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"https://twitterfunctionjs.azurewebsites.net/api/validateTweet"),
-                Method = HttpMethod.Post,
-                Headers =
-                {
-                    { System.Net.HttpRequestHeader.Authorization.ToString(), bearer }
-                },
-                Content = new System.Net.Http.StringContent("{tweetText:\"" + tweet.StatusBody + "\"}", Encoding.UTF8, "application/json")
-
-            };
-            var apiResponse = apiClient.SendAsync(apiRequest).Result;
-            var validationResult = apiResponse.Content.ReadAsAsync<TwitterTextValidationResponse>().Result;
-            if (validationResult.isValid == false)
-            {
-                return BadRequest("Tweet text failed validation");
-            }
-
-
-            // find twitter handle approver
-            var account = _databaseContext.TwitterAccounts.FirstOrDefault(a => a.TwitterHandle == tweet.TwitterHandle);
-            tweet.HandleUser = account.HandleUser;
-
-            // populate last few object fields
-            tweet.CreatedTime = DateTime.UtcNow;
-            tweet.IsApprovedByHandle = false;
-            tweet.IsPostedByWebJob = false;
-
-            _databaseContext.TweetQueues.Add(tweet);
-            _databaseContext.SaveChanges();
-
-            NotificationService.SendNotificationToHandle(tweet);
-            tweet.HandleUser = null;
-            return Ok(tweet);
-        }
-
         // get tweets by person who entered/owns template
-        [Authorize]
         [HttpGet, Route("api/tweet-templates-by-handle")]
         public IHttpActionResult GetAllTemplatesByHandle(string twitterHandle)
         {
@@ -97,9 +32,7 @@ namespace TwitterBot.Controllers
             return Ok(templates);
         }
 
-
         // insert
-        [Authorize]
         [HttpPost, Route("api/tweet-template")]
         public IHttpActionResult PostNewTemplate(TweetTemplate tweetTemplate)
         {
@@ -121,7 +54,6 @@ namespace TwitterBot.Controllers
         }
 
         // update
-        [Authorize]
         [HttpPatch, Route("api/tweet-template")]
         public IHttpActionResult PostEditedTemplate(TweetTemplate tweetTemplate)
         {
@@ -158,7 +90,6 @@ namespace TwitterBot.Controllers
         }
 
         // delete
-        [Authorize]
         [HttpDelete, Route("api/tweet-template")]
         public IHttpActionResult DeleteTemplate(int Id)
         {

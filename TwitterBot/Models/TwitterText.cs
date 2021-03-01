@@ -7,9 +7,10 @@ namespace TwitterBot.Models
 {
     public class TwitterTextValidationResponse
     {
-        public string textReturn;
-        public bool isValid;
+        public string textReturn { get; set; }
+        public bool isValid { get; set; }
     }
+
     public class TwitterTextValidationRequest
     {
         public string tweetText;
