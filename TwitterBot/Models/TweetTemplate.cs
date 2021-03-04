@@ -22,6 +22,7 @@ namespace TwitterBot.Models
         [StringLength(40)]
         public string HandleUser { get; set; }
 
+        [StringLength(255)]
         public string ChangedThresholdPercentage { get; set; }
 
         public bool CodeChanges { get; set; }
