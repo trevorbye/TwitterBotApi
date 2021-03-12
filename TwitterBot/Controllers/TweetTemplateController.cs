@@ -21,15 +21,6 @@ namespace TwitterBot.Controllers
     {
         readonly TwitterBotContext _databaseContext = new TwitterBotContext();
 
-        [HttpGet, Route("api/tweet-templates-all")]
-        public IHttpActionResult GetAllTemplates()
-        {
-            var list = _databaseContext.TweetTemplates.ToList();
-            return Ok(list);
-        }
-
-
-
         // get tweets by person who entered/owns template
         [HttpGet, Route("api/tweet-templates-by-handle")]
         public IHttpActionResult GetAllTemplatesByHandle(string twitterHandle)
