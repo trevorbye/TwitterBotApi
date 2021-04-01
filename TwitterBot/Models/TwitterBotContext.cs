@@ -17,6 +17,11 @@ namespace TwitterBot.Models
     
         public TwitterBotContext() : base("name=TwitterBotContext")
         {
+            // Remove Database Checks 
+            // If DB is out of sync from latest migration - don't throw 500s on API endpoint calls
+            // Issue: https://github.com/dotnet/ef6/issues/1824#event-4404180303
+            // Docs: https://www.entityframeworktutorial.net/code-first/database-initialization-strategy-in-code-first.aspx
+            Database.SetInitializer <TwitterBotContext>(new NullDatabaseInitializer<TwitterBotContext>());
         }
 
         public DbSet<AdminManager> AdminManagers { get; set; }
@@ -24,6 +29,8 @@ namespace TwitterBot.Models
         public DbSet<TweetQueue> TweetQueues { get; set; }
 
         public DbSet<TwitterAccount> TwitterAccounts { get; set; }
+
+        public DbSet<TweetTemplate> TweetTemplates { get; set; }
 
     }
 }

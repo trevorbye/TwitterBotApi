@@ -226,7 +226,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminManagersController.cs" />
     <Compile Include="Controllers\AppController.cs" />
+    <Compile Include="Controllers\TweetAutomationController.cs" />
     <Compile Include="Controllers\TweetQueuesController.cs" />
+    <Compile Include="Controllers\TweetTemplateController.cs" />
     <Compile Include="Controllers\UtilController.cs" />
     <Compile Include="Controllers\WebJobController.cs" />
     <Compile Include="Extensions\ClaimsIdentityExtensions.cs" />
@@ -248,8 +250,10 @@
     <Compile Include="Models\AdminManager.cs" />
     <Compile Include="Models\TweetQueue.cs" />
     <Compile Include="Models\TweetQueueAccountReturnEntity.cs" />
+    <Compile Include="Models\TweetTemplate.cs" />
     <Compile Include="Models\TwitterAccount.cs" />
     <Compile Include="Models\TwitterBotContext.cs" />
+    <Compile Include="Models\TwitterText.cs" />
     <Compile Include="POCOS\BlockBlobManager.cs" />
     <Compile Include="POCOS\NotificationService.cs" />
     <Compile Include="POCOS\Utilities.cs" />
@@ -267,6 +271,7 @@
     <None Include="Properties\PublishProfiles\MSTwitterBot - SQL Projects .pubxml" />
     <None Include="Properties\PublishProfiles\MSTwitterBot - Web Deploy.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
+    <None Include="Properties\PublishProfiles\STAGE-TwitterBot - Web Deploy.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
