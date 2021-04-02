@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Net.Http;
+using System.Net;
+using System.Diagnostics;
 
 namespace TwitterBot.Controllers
 {
@@ -25,11 +27,19 @@ namespace TwitterBot.Controllers
         [HttpGet, Route("api/tweet-templates-by-handle")]
         public IHttpActionResult GetAllTemplatesByHandle(string twitterHandle)
         {
-            var user = User.GetUsername();
-            IList<TweetTemplate> templates = _databaseContext.TweetTemplates
-                .Where(table => table.TwitterHandle == twitterHandle && table.TweetUser==user)
-                .OrderByDescending(x => x.Title).ToList();
-            return Ok(templates);
+            try
+            {
+                var user = User.GetUsername();
+                IList<TweetTemplate> templates = _databaseContext.TweetTemplates
+                    .Where(table => table.TwitterHandle == twitterHandle && table.TweetUser == user)
+                    .OrderByDescending(x => x.Title).ToList();
+                return Ok(templates);
+            } catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Trace.TraceError(e.Message.ToString());
+                return BadRequest(e.Message.ToString());
+            }
         }
 
         // insert

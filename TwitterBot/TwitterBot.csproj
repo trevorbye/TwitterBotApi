@@ -271,7 +271,7 @@
     <None Include="Properties\PublishProfiles\MSTwitterBot - SQL Projects .pubxml" />
     <None Include="Properties\PublishProfiles\MSTwitterBot - Web Deploy.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
-    <None Include="Properties\PublishProfiles\STAGE-TwitterBot - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\mstwitterbot-api-stage - Web Deploy.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
