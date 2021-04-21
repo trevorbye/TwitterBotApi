@@ -1,27 +1,25 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Web.Http;
-using TwitterBot.Models;
-using TwitterBot.POCOS;
-using System.Security.Claims;
-using TwitterBot.Extensions;
-using System.Web.Http.Results;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Net.Http;
-using System.Net;
 using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Http;
+using TwitterBot.Extensions;
+using TwitterBot.Models;
 
 namespace TwitterBot.Controllers
 {
     [Authorize]
     public class TweetTemplateController : ApiController
     {
+        static readonly string TweetAutomationUriWithCode = Environment.GetEnvironmentVariable("TWEET_AUTOMATION_URI_WITH_CODE");
         readonly TwitterBotContext _databaseContext = new TwitterBotContext();
+        readonly static HttpClient _httpCient = new HttpClient();
 
         // get tweets by person who entered/owns template
         [HttpGet, Route("api/tweet-templates-by-handle")]
@@ -44,7 +42,7 @@ namespace TwitterBot.Controllers
 
         // insert
         [HttpPost, Route("api/tweet-template")]
-        public IHttpActionResult PostNewTemplate(TweetTemplate tweetTemplate)
+        public async Task<IHttpActionResult> PostNewTemplate(TweetTemplate tweetTemplate)
         {
             var user = User.GetUsername();
             tweetTemplate.TweetUser = user; // creator of template and cooresponding tweets
@@ -60,12 +58,14 @@ namespace TwitterBot.Controllers
             _databaseContext.TweetTemplates.Add(tweetTemplate);
             _databaseContext.SaveChanges();
 
+            await NotifyTemplateAutomationSystem(tweetTemplate, "create");
+
             return Ok(tweetTemplate);
         }
 
         // update
         [HttpPatch, Route("api/tweet-template")]
-        public IHttpActionResult PostEditedTemplate(TweetTemplate tweetTemplate)
+        public async Task<IHttpActionResult> PostEditedTemplate(TweetTemplate tweetTemplate)
         {
             var user = User.GetUsername();
 
@@ -96,6 +96,8 @@ namespace TwitterBot.Controllers
 
             _databaseContext.SaveChanges();
 
+            await NotifyTemplateAutomationSystem(existingTemplate, "update");
+
             return Ok();
         }
 
@@ -118,6 +120,36 @@ namespace TwitterBot.Controllers
                 return BadRequest();
             }
         }
+        public async Task NotifyTemplateAutomationSystem(TweetTemplate tweetTemplate, String action)
+        {
+
+            TemplateNotification payLoad = new TemplateNotification
+            {
+                template = tweetTemplate,
+                action = action
+            };
+
+            var stringPayload = await Task.Run(() => JsonConvert.SerializeObject(payLoad));
+            var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+
+            var apiRequest = new HttpRequestMessage
+            {
+                RequestUri = new Uri(TweetAutomationUriWithCode),
+                Method = HttpMethod.Post,
+                Headers =
+                {
+                    { HttpRequestHeader.Accept.ToString(), "application/json"}
+ 
+                },
+                Content = httpContent
+
+            };
+            // Bobby's DocIndex system may return 500s until is understands the payload.
+            var apiResponse = await _httpCient.SendAsync(apiRequest);
+
+            return;
+        }
+
     }
 }
 

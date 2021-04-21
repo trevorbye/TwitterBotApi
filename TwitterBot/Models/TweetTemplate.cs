@@ -6,6 +6,14 @@ namespace TwitterBot.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
+    public class TemplateNotification
+    {
+        public TweetTemplate template { get; set; }
+        
+        // Create, Update, Delete, Read
+        public string action { get; set; }
+    }
+
     public partial class TweetTemplate
     {
         public int Id { get; set; }
