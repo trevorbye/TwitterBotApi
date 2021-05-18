@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,6 +8,7 @@ using System.Web;
 using System.Web.Http;
 using TwitterBot.Extensions;
 using TwitterBot.Models;
+using TwitterBot.POCOS;
 
 namespace TwitterBot.Controllers
 {
@@ -21,6 +23,7 @@ namespace TwitterBot.Controllers
         [HttpGet, Route("api/twitter-auth-token")]
         public async Task<IHttpActionResult> GetTwitterOauthString()
         {
+            Utilities.Log(api: "api/twitter-auth-token", properties: new Dictionary<string, string>() { { "state", "entered" } });
             var baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/request_token");
             var oauthCallback = WebUtility.UrlEncode(Callback);
             var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
@@ -73,6 +76,7 @@ namespace TwitterBot.Controllers
         public async Task<IHttpActionResult> GetTwitterAccessToken(string token, string verifier)
         {
             var principle = User.GetUsername();
+            Utilities.Log(api: "api/enable-auto-tweets", properties: new Dictionary<string, string>() { { "state", "entered" }, { "principle", principle} });
 
             var baseUrl = WebUtility.UrlEncode("https://api.twitter.com/oauth/access_token");
             var oauthConsumerKey = WebUtility.UrlEncode(ConsumerKey);
@@ -132,7 +136,7 @@ namespace TwitterBot.Controllers
             };
 
             // Check if account has already been added
-            var accounts = 
+            var accounts =
                 _databaseContext.TwitterAccounts
                                 .Where(table => table.TwitterHandle == twitterAccount.TwitterHandle)
                                 .ToList();
@@ -153,7 +157,9 @@ namespace TwitterBot.Controllers
         [HttpGet, Route("api/enable-auto-tweets")]
         public IHttpActionResult EnableAccountRetweetStatus(string handle)
         {
+
             var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            Utilities.Log(api: "api/enable-auto-tweets", properties: new Dictionary<string, string>() { { "state", "entered" }, { "ownsHandle", ownsHandle.ToString() }, { "accountId", account.Id.ToString() } });
             if (!ownsHandle)
             {
                 return BadRequest();
@@ -171,6 +177,7 @@ namespace TwitterBot.Controllers
         public IHttpActionResult DisableAccountRetweetStatus(string handle)
         {
             var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+            Utilities.Log(api: "api/disable-auto-tweets", properties: new Dictionary<string, string>() { { "state", "entered" }, { "ownsHandle", ownsHandle.ToString() }, { "accountId", account.Id.ToString() } });
             if (!ownsHandle)
             {
                 return BadRequest();
@@ -187,7 +194,10 @@ namespace TwitterBot.Controllers
         [HttpGet, Route("api/toggle-private-account")]
         public IHttpActionResult TogglePrivateAccount(string handle, bool isPrivate)
         {
+
             var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+
+            Utilities.Log(api: "api/toggle-private-account", properties: new Dictionary<string, string>() { { "state", "entered" }, { "ownsHandle", ownsHandle.ToString() }, { "accountId", account.Id.ToString()} });
             if (!ownsHandle)
             {
                 return BadRequest();
@@ -205,6 +215,8 @@ namespace TwitterBot.Controllers
         public IHttpActionResult ToggleMakeSchedulePublic(string handle, bool isPublic)
         {
             var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+
+            Utilities.Log(api: "api/toggle-public-schedule", properties: new Dictionary<string, string>() { { "state", "entered" }, { "ownsHandle", ownsHandle.ToString() }, { "accountId", account.Id.ToString()} });
             if (!ownsHandle)
             {
                 return BadRequest();
@@ -222,6 +234,9 @@ namespace TwitterBot.Controllers
         public IHttpActionResult DeleteTwitterAccount(string handle)
         {
             var (ownsHandle, account) = EnsurePrincipleOwnsHandle(handle);
+
+            Utilities.Log(api: "api/delete-twitter-account", properties: new Dictionary<string, string>() { { "state", "entered" }, { "ownsHandle", ownsHandle.ToString() }, { "accountId", account.Id.ToString()} });
+
             if (!ownsHandle)
             {
                 return BadRequest();
@@ -247,6 +262,8 @@ namespace TwitterBot.Controllers
         public IHttpActionResult GetUserTwitterAccounts()
         {
             var principle = User.GetUsername();
+
+            Utilities.Log(api: "api/get-user-twitter-accounts", properties: new Dictionary<string, string>() { { "state", "entered" }, {"principle", principle} });
 
             return Ok(
                 _databaseContext.TwitterAccounts
