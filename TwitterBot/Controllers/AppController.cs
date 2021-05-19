@@ -276,5 +276,30 @@ namespace TwitterBot.Controllers
                         account.IsTweetSchedulePublic
                     }));
         }
+
+        [HttpGet, Route("api/get-user-data")]
+        public IHttpActionResult GetUserData()
+        {
+            var principle = User.GetUsername();
+
+            Utilities.Log(api: "api/get-user-data", properties: new Dictionary<string, string>() { { "state", "entered" }, { "principle", principle } });
+            
+
+            if (!String.IsNullOrEmpty(principle))
+            {
+                var userAccounts = _databaseContext.TwitterAccounts.Where(table => table.HandleUser == principle).ToList();
+                var userTemplates = _databaseContext.TweetTemplates.Where(table => table.HandleUser == principle).ToList();
+                var userTweets = _databaseContext.TweetQueues.Where(table => table.HandleUser == principle).ToList();
+
+                UserData userData = new UserData() {
+                    Tweets = userTweets,
+                    Accounts = userAccounts,
+                    Templates = userTemplates
+                };
+                return Ok(userData);
+            }
+
+            return BadRequest();
+        }
     }
 }
