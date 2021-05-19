@@ -288,8 +288,8 @@ namespace TwitterBot.Controllers
             if (!String.IsNullOrEmpty(principle))
             {
                 var userAccounts = _databaseContext.TwitterAccounts.Where(table => table.HandleUser == principle).ToList();
-                var userTemplates = _databaseContext.TweetTemplates.Where(table => table.HandleUser == principle).ToList();
-                var userTweets = _databaseContext.TweetQueues.Where(table => table.HandleUser == principle).ToList();
+                var userTemplates = _databaseContext.TweetTemplates.Where(table => table.TweetUser == principle).ToList();
+                var userTweets = _databaseContext.TweetQueues.Where(table => table.TweetUser == principle).ToList();
 
                 UserData userData = new UserData() {
                     Tweets = userTweets,
