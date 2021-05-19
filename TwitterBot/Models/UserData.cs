@@ -7,8 +7,8 @@ namespace TwitterBot.Models
 {
     public class UserData
     {
-        public IQueryable<TweetQueue> Tweets;
-        public IQueryable<TwitterAccount> Accounts;
-        public IQueryable<TweetTemplate> Templates;
+        public List<TweetQueue> Tweets;
+        public List<TwitterAccount> Accounts;
+        public List<TweetTemplate> Templates;
     }
 }
